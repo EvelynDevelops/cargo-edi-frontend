@@ -1,10 +1,10 @@
-// app/page.tsx
 "use client";
 
 import { useState } from "react";
 import CargoFormItem, { CargoFormData } from "@/components/CargoFormItem";
 
 export default function HomePage() {
+  // Initial cargo items list
   const [cargoItems, setCargoItems] = useState<CargoFormData[]>([
     {
       cargo_type: "LCL",
@@ -14,10 +14,16 @@ export default function HomePage() {
       house_bill_of_lading_number: "",
     },
   ]);
+
+  // Output and state handling
   const [ediOutput, setEdiOutput] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Check if string only contains letters and numbers
+  const isAlphaNumeric = (text: string) => /^[a-zA-Z0-9]*$/.test(text);
+
+  // Download EDI result as .edi file
   const handleDownload = () => {
     const blob = new Blob([ediOutput], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
@@ -27,7 +33,8 @@ export default function HomePage() {
     a.click();
     URL.revokeObjectURL(url);
   };
-  
+
+  // Copy EDI output to clipboard
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(ediOutput);
@@ -36,14 +43,15 @@ export default function HomePage() {
       console.error("Failed to copy", err);
     }
   };
-  
 
+  // Update cargoItems list when user edits a form field
   const handleChange = (index: number, updated: CargoFormData) => {
     const newItems = [...cargoItems];
     newItems[index] = updated;
     setCargoItems(newItems);
   };
 
+  // Add a new cargo item
   const handleAdd = () => {
     setCargoItems((prev) => [
       ...prev,
@@ -57,16 +65,40 @@ export default function HomePage() {
     ]);
   };
 
+  // Remove a cargo item
   const handleDelete = (index: number) => {
     if (cargoItems.length > 1) {
       setCargoItems((prev) => prev.filter((_, i) => i !== index));
     }
   };
 
+  // Validate all optional fields before submission
+  const validateAllInputs = (): boolean => {
+    for (let i = 0; i < cargoItems.length; i++) {
+      const item = cargoItems[i];
+      if (
+        (item.container_number && !isAlphaNumeric(item.container_number)) ||
+        (item.master_bill_of_lading_number && !isAlphaNumeric(item.master_bill_of_lading_number)) ||
+        (item.house_bill_of_lading_number && !isAlphaNumeric(item.house_bill_of_lading_number))
+      ) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  // Submit and generate EDI if all inputs are valid
   const handleSubmit = async () => {
+    const isValid = validateAllInputs();
+    if (!isValid) {
+      alert("Some fields contain invalid characters. Please correct them as indicated in red before submitting.");
+      return;
+    }
+
     setLoading(true);
     setError("");
     setEdiOutput("");
+
     try {
       const response = await fetch("http://localhost:8000/generate-edi", {
         method: "POST",
@@ -86,7 +118,7 @@ export default function HomePage() {
       setError(err.message || "Unknown error");
     } finally {
       setLoading(false);
-      window.scrollTo({ top: 0, behavior: "smooth" });    
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -94,9 +126,11 @@ export default function HomePage() {
     <main>
       <h1 className="text-2xl font-bold mb-6">Cargo EDI Generator</h1>
       <div className="grid md:grid-cols-2 gap-12 items-start">
-        {/* Left form list with scroll */}
+        {/* Left: Cargo input forms */}
         <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Cargo Information</h2>
+          <h2 className="text-xl font-semibold">Cargo Information</h2>
+
+          {/* List of CargoFormItem components */}
           {cargoItems.map((item, index) => (
             <CargoFormItem
               key={index}
@@ -107,6 +141,7 @@ export default function HomePage() {
             />
           ))}
 
+          {/* Add / Submit buttons */}
           <div className="flex flex-col gap-3 sticky bottom-0 bg-white pb-4 pt-2">
             <button
               type="button"
@@ -126,36 +161,28 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Right: EDI output */}
+        {/* Right: EDI Output with download */}
         <div className="space-y-2 w-full">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Generated EDI Message</h2>
-          <div className="flex gap-2">
-            <button
-              onClick={handleDownload}
-              className="text-sm underline text-gray-600 hover:text-black"
-            >
-              Download .edi
-            </button>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold">Generated EDI Message</h2>
+            <div className="flex gap-2">
+              <button
+                onClick={handleDownload}
+                className="text-sm underline text-gray-600 hover:text-black"
+              >
+                Download .edi
+              </button>
+            </div>
           </div>
 
-        </div>
           <textarea
             className="w-full h-150 border border-gray-300 rounded-md p-3 text-sm font-mono resize-none"
             value={ediOutput}
             readOnly
             placeholder="EDI string will appear here..."
           />
-            <button
-              onClick={handleCopy}
-              className="absolute top-2 right-2 text-xs px-2 py-1 border border-gray-300 rounded bg-white hover:bg-gray-100 transition"
-            >
-              Copy
-            </button>
         </div>
-        
       </div>
-
     </main>
   );
 }

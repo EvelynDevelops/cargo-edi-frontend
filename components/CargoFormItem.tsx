@@ -1,7 +1,6 @@
-// components/CargoFormItem.tsx
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 export type CargoFormData = {
   cargo_type: "FCX" | "LCL" | "FCL";
@@ -16,11 +15,51 @@ type Props = {
   data: CargoFormData;
   onChange: (index: number, updated: CargoFormData) => void;
   onDelete?: () => void;
+  onValidate?: (index: number, isValid: boolean) => void;
 };
 
-const CargoFormItem: React.FC<Props> = ({ index, data, onChange, onDelete }) => {
+const CargoFormItem: React.FC<Props> = ({ index, data, onChange, onDelete, onValidate }) => {
+  const [errors, setErrors] = useState({
+    container_number: "",
+    master_bill_of_lading_number: "",
+    house_bill_of_lading_number: "",
+  });
+
+  // Check if all fields are valid (used to call onValidate)
+  const validateAllFields = (updated: CargoFormData) => {
+    const fieldsToCheck: (keyof CargoFormData)[] = [
+      "container_number",
+      "master_bill_of_lading_number",
+      "house_bill_of_lading_number",
+    ];
+    
+    return fieldsToCheck.every((field) => {
+      const val = updated[field];
+      return !val || /^[a-zA-Z0-9]*$/.test(val as string);
+    });    
+  };
+
+  // Trigger validation report to parent when errors change
+  useEffect(() => {
+    if (onValidate) {
+      const isValid = Object.values(errors).every((e) => e === "");
+      onValidate(index, isValid);
+    }
+  }, [errors, index, onValidate]);
+
   const handleFieldChange = (field: keyof CargoFormData, value: any) => {
     const updated = { ...data, [field]: value };
+
+    if (
+      ["container_number", "master_bill_of_lading_number", "house_bill_of_lading_number"].includes(field)
+    ) {
+      const isValid = value === "" || /^[a-zA-Z0-9]*$/.test(value);
+      setErrors((prev) => ({
+        ...prev,
+        [field]: isValid ? "" : `${field.replaceAll("_", " ")} can only contain letters and numbers`,
+      }));
+    }
+
     onChange(index, updated);
   };
 
@@ -40,10 +79,11 @@ const CargoFormItem: React.FC<Props> = ({ index, data, onChange, onDelete }) => 
       </div>
 
       <div className="flex flex-col gap-4">
+        {/* Cargo Type */}
         <div>
-          <label className="block text-sm text-gray-700 font-medium mb-1">Cargo Type</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Cargo Type</label>
           <select
-            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
             value={data.cargo_type}
             onChange={(e) => handleFieldChange("cargo_type", e.target.value)}
           >
@@ -53,48 +93,61 @@ const CargoFormItem: React.FC<Props> = ({ index, data, onChange, onDelete }) => 
           </select>
         </div>
 
+        {/* Number of Packages */}
         <div>
-          <label className="block text-sm text-gray-700 font-medium mb-1">Number of Packages</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Number of Packages</label>
           <input
             type="number"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            min={1}
+            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
             value={data.number_of_packages}
             onChange={(e) => handleFieldChange("number_of_packages", Number(e.target.value))}
-            placeholder="Enter number of packages"
           />
         </div>
 
+        {/* Container Number */}
         <div>
-          <label className="block text-sm text-gray-700 font-medium mb-1">Container Number (Optional)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Container Number (Optional)</label>
           <input
             type="text"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={data.container_number || ""}
             onChange={(e) => handleFieldChange("container_number", e.target.value)}
+            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
             placeholder="Enter container number"
           />
+          {errors.container_number && (
+            <p className="text-red-500 text-sm mt-1">{errors.container_number}</p>
+          )}
         </div>
 
+        {/* Master Bill */}
         <div>
-          <label className="block text-sm text-gray-700 font-medium mb-1">Master Bill of Lading Number (Optional)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Master Bill of Lading Number (Optional)</label>
           <input
             type="text"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={data.master_bill_of_lading_number || ""}
             onChange={(e) => handleFieldChange("master_bill_of_lading_number", e.target.value)}
+            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
             placeholder="Enter master bill number"
           />
+          {errors.master_bill_of_lading_number && (
+            <p className="text-red-500 text-sm mt-1">{errors.master_bill_of_lading_number}</p>
+          )}
         </div>
 
+        {/* House Bill */}
         <div>
-          <label className="block text-sm text-gray-700 font-medium mb-1">House Bill of Lading Number (Optional)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">House Bill of Lading Number (Optional)</label>
           <input
             type="text"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={data.house_bill_of_lading_number || ""}
             onChange={(e) => handleFieldChange("house_bill_of_lading_number", e.target.value)}
+            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
             placeholder="Enter house bill number"
           />
+          {errors.house_bill_of_lading_number && (
+            <p className="text-red-500 text-sm mt-1">{errors.house_bill_of_lading_number}</p>
+          )}
         </div>
       </div>
     </div>
