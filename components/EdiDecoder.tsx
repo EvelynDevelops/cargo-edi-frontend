@@ -22,7 +22,7 @@ const EdiDecoder = forwardRef(function EdiDecoder({ onDecode }: Props, ref) {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("http://localhost:8000/decode-edi", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/decode-edi`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

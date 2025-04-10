@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import CargoFormItem, { CargoFormData } from "@/components/CargoFormItem";
+import EdiOutputPanel from "@/components/EdiOutputPanel";
 
 export default function HomePage() {
   // Initial cargo items list
@@ -100,7 +101,7 @@ export default function HomePage() {
     setEdiOutput("");
 
     try {
-      const response = await fetch("http://localhost:8000/generate-edi", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/generate-edi`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -162,26 +163,11 @@ export default function HomePage() {
         </div>
 
         {/* Right: EDI Output with download */}
-        <div className="space-y-2 w-full">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold">Generated EDI Message</h2>
-            <div className="flex gap-2">
-              <button
-                onClick={handleDownload}
-                className="text-sm underline text-gray-600 hover:text-black"
-              >
-                Download .edi
-              </button>
-            </div>
-          </div>
-
-          <textarea
-            className="w-full h-150 border border-gray-300 rounded-md p-3 text-sm font-mono resize-none"
-            value={ediOutput}
-            readOnly
-            placeholder="EDI string will appear here..."
-          />
-        </div>
+        <EdiOutputPanel
+          ediOutput={ediOutput}
+          onDownload={handleDownload}
+          onCopy={handleCopy}
+        />
       </div>
     </main>
   );
