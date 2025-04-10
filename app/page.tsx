@@ -39,7 +39,6 @@ export default function HomePage() {
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(ediOutput);
-      alert("Copied!");
     } catch (err) {
       console.error("Failed to copy", err);
     }
