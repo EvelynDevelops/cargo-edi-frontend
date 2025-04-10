@@ -23,6 +23,7 @@ const CargoFormItem: React.FC<Props> = ({ index, data, onChange, onDelete, onVal
     container_number: "",
     master_bill_of_lading_number: "",
     house_bill_of_lading_number: "",
+    number_of_packages: "",
   });
 
   // Check if all fields are valid (used to call onValidate)
@@ -58,9 +59,25 @@ const CargoFormItem: React.FC<Props> = ({ index, data, onChange, onDelete, onVal
         ...prev,
         [field]: isValid ? "" : `${field.replaceAll("_", " ")} can only contain letters and numbers`,
       }));
+    } else if (field === "number_of_packages") {
+      setErrors((prev) => ({
+        ...prev,
+        [field]: "",
+      }));
     }
 
     onChange(index, updated);
+  };
+
+  const handleBlur = (field: keyof CargoFormData, value: any) => {
+    if (field === "number_of_packages") {
+      if (value === "" || value < 1) {
+        setErrors((prev) => ({
+          ...prev,
+          [field]: "Number of packages must be at least 1",
+        }));
+      }
+    }
   };
 
   return (
@@ -100,9 +117,13 @@ const CargoFormItem: React.FC<Props> = ({ index, data, onChange, onDelete, onVal
             type="number"
             min={1}
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-            value={data.number_of_packages}
-            onChange={(e) => handleFieldChange("number_of_packages", Number(e.target.value))}
+            value={data.number_of_packages || ""}
+            onChange={(e) => handleFieldChange("number_of_packages", e.target.value === "" ? "" : Number(e.target.value))}
+            onBlur={(e) => handleBlur("number_of_packages", e.target.value === "" ? "" : Number(e.target.value))}
           />
+          {errors.number_of_packages && (
+            <p className="text-red-500 text-sm mt-1">{errors.number_of_packages}</p>
+          )}
         </div>
 
         {/* Container Number */}
