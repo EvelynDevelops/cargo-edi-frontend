@@ -142,7 +142,7 @@ export default function HomePage() {
           ))}
 
           {/* Add / Submit buttons */}
-          <div className="flex flex-col gap-3 sticky bottom-0 bg-white pb-4 pt-2">
+          <div className="flex flex-col gap-3 sticky bottom-0 bg-transparent pb-4 pt-2">
             <button
               type="button"
               onClick={handleAdd}
