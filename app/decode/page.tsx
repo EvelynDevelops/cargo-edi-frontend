@@ -8,6 +8,7 @@ import { CargoFormData } from "@/components/CargoFormItem";
 export default function DecodePage() {
   const decoderRef = useRef<{ handleDecode: () => void }>(null);
   const [decoded, setDecoded] = useState<CargoFormData[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const handleDownloadJson = () => {
     const blob = new Blob([JSON.stringify(decoded, null, 2)], {
@@ -35,7 +36,7 @@ export default function DecodePage() {
             onClick={() => decoderRef.current?.handleDecode()}
             className="w-full mt-4 bg-gray-800 text-white py-2 rounded-md text-sm hover:bg-gray-700 transition"
           >
-            Decode EDI
+             {loading ? "Decoding..." : "Decode EDI"}
           </button>
         </div>
 
