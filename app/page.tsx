@@ -3,6 +3,7 @@
 import { useState } from "react";
 import CargoFormItem, { CargoFormData } from "@/components/CargoFormItem";
 import EdiOutputPanel from "@/components/EdiOutputPanel";
+import ConfirmationModal from "@/components/ConfirmationModal";
 
 export default function HomePage() {
   // Initial cargo items list
@@ -20,6 +21,7 @@ export default function HomePage() {
   const [ediOutput, setEdiOutput] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Check if string only contains letters and numbers
   const isAlphaNumeric = (text: string) => /^[a-zA-Z0-9]*$/.test(text);
@@ -122,6 +124,21 @@ export default function HomePage() {
     }
   };
 
+  // Open confirmation modal
+  const handleOpenModal = () => {
+    const isValid = validateAllInputs();
+    if (!isValid) {
+      alert("Some fields contain invalid characters. Please correct them as indicated in red before submitting.");
+      return;
+    }
+    setIsModalOpen(true);
+  };
+
+  // Close confirmation modal
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <main>
       <h1 className="text-2xl font-bold mb-6">Cargo EDI Generator</h1>
@@ -152,7 +169,7 @@ export default function HomePage() {
             </button>
             <button
               type="button"
-              onClick={handleSubmit}
+              onClick={handleOpenModal}
               className="w-full bg-gray-800 text-white py-2 rounded-md text-sm hover:bg-gray-700 transition"
             >
               {loading ? "Generating..." : "Generate EDI"}
@@ -168,6 +185,14 @@ export default function HomePage() {
           onCopy={handleCopy}
         />
       </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onConfirm={handleSubmit}
+        cargoItems={cargoItems}
+      />
     </main>
   );
 }
