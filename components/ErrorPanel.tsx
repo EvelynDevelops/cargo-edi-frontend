@@ -18,20 +18,39 @@ const ErrorPanel: React.FC<ErrorPanelProps> = ({
     // Remove EDI decoding failed: Invalid EDI format: prefix
     const withoutPrefix = errorMsg.replace(/^EDI decoding failed: Invalid EDI format:\s*/, '');
     
-    // If error message is in array format
+    // If error message is in array format (handles both [' '] and [" "] formats)
     if (withoutPrefix.startsWith('[') && withoutPrefix.endsWith(']')) {
-      // Remove brackets
-      const content = withoutPrefix.slice(1, -1);
-      // If content contains multiple errors, separate with newlines
-      return content.split(',').map(err => {
-        // Remove quotes and Line prefix from each error message
-        const trimmed = err.trim();
-        const withoutQuotes = trimmed.replace(/^'|'$/g, '');
-        const withoutLinePrefix = withoutQuotes.replace(/^Line \d+:\s*/, '');
-        return withoutLinePrefix;
+      // Extract the actual content inside brackets
+      const contentWithQuotes = withoutPrefix.slice(1, -1);
+      
+      // Remove both single and double quotes at beginning and end
+      let cleanContent = contentWithQuotes;
+      if ((cleanContent.startsWith("'") && cleanContent.endsWith("'")) || 
+          (cleanContent.startsWith('"') && cleanContent.endsWith('"'))) {
+        cleanContent = cleanContent.slice(1, -1);
+      }
+      
+      // Split by commas if there are multiple errors
+      // But be careful not to split inside the error message itself
+      let errors = [cleanContent]; // Default to single error
+      if (cleanContent.includes('", "') || cleanContent.includes("', '")) {
+        // This is a more complex case with multiple errors
+        // Use regex to split properly
+        const multipleErrors = cleanContent.match(/['"][^'"]*['"],\s*['"][^'"]*['"]|['"][^'"]*['"]/g);
+        if (multipleErrors) {
+          errors = multipleErrors.map(e => e.replace(/^['"]|['"]$/g, ''));
+        }
+      }
+      
+      // Process each error
+      return errors.map(err => {
+        // Remove line prefix
+        return err.replace(/^Line \d+:\s*/, '');
       }).join('\n');
     }
-    return withoutPrefix;
+    
+    // For single error (not in array format), just remove line prefix
+    return withoutPrefix.replace(/^Line \d+:\s*/, '');
   };
 
   const formattedError = formatError(error);
