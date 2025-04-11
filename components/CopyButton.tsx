@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import CheckIcon from "../public/icons/CheckIcon";
+import SuccessIcon from "../public/icons/SuccessIcon";
 
 type Props = {
   onCopy: () => void;
@@ -52,9 +52,9 @@ const CopyButton: React.FC<Props> = ({ onCopy, className = "" }) => {
       className={`text-xs px-2 py-1 border border-gray-300 rounded bg-white hover:bg-gray-100 transition flex items-center justify-center w-8 h-6 ${className}`}
     >
       {isCopied ? (
-        <CheckIcon className="h-4 w-4 text-green-500" width={16} height={16} />
+        <SuccessIcon className="h-4 w-4 text-gray-600" width={16} height={16} />
       ) : (
-        "Copy"
+        <span className="text-[10px]">Copy</span>
       )}
     </button>
   );
