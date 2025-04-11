@@ -64,19 +64,6 @@ const CargoCard: React.FC<Props> = ({ data, index, onUpdate, readOnly = false })
 
   return (
     <div className="bg-white border border-gray-300 rounded-xl px-6 py-4 shadow-sm space-y-2 relative">
-      {/* Edit/Save button - only shown when not in read-only mode */}
-      {!readOnly && (
-        <button
-          onClick={isEditing ? handleSave : handleEdit}
-          className={`absolute top-2 right-2 px-2 py-1 text-xs rounded ${
-            isEditing
-              ? "bg-gray-800 text-white hover:bg-gray-700"
-              : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-          }`}
-        >
-          {isEditing ? "Save" : "Edit"}
-        </button>
-      )}
       
       {/* Card header with cargo item number */}
       <h3 className="text-lg font-semibold text-gray-800 bg-gray-100 px-4 py-2 -mx-6 -mt-4 rounded-t-xl">
@@ -112,7 +99,7 @@ const CargoCard: React.FC<Props> = ({ data, index, onUpdate, readOnly = false })
         
         {/* Container Number field */}
         <div className="flex items-center justify-between">
-          <span className="font-medium whitespace-nowrap mr-4">Container #:</span>
+          <span className="font-medium whitespace-nowrap mr-4">Container number:</span>
           <input
             type="text"
             value={isEditing ? (editedData.container_number || "") : (data.container_number || "")}
@@ -124,7 +111,7 @@ const CargoCard: React.FC<Props> = ({ data, index, onUpdate, readOnly = false })
         
         {/* Master Bill of Lading Number field */}
         <div className="flex items-center justify-between">
-          <span className="font-medium whitespace-nowrap mr-4">Master Bill #:</span>
+          <span className="font-medium whitespace-nowrap mr-4">Master Bill number:</span>
           <input
             type="text"
             value={isEditing ? (editedData.master_bill_of_lading_number || "") : (data.master_bill_of_lading_number || "")}
@@ -136,7 +123,7 @@ const CargoCard: React.FC<Props> = ({ data, index, onUpdate, readOnly = false })
         
         {/* House Bill of Lading Number field */}
         <div className="flex items-center justify-between">
-          <span className="font-medium whitespace-nowrap mr-4">House Bill #:</span>
+          <span className="font-medium whitespace-nowrap mr-4">House Bill number:</span>
           <input
             type="text"
             value={isEditing ? (editedData.house_bill_of_lading_number || "") : (data.house_bill_of_lading_number || "")}
