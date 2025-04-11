@@ -4,9 +4,10 @@ import { useRef, useState } from "react";
 import EdiDecoder from "@/components/EdiDecoder";
 import CargoCard from "@/components/CargoCard";
 import { CargoFormData } from "@/components/CargoFormItem";
+import OutputPanel from "../../components/OutputPanel";
 
 export default function DecodePage() {
-  const decoderRef = useRef<{ handleDecode: () => void }>(null);
+  const decoderRef = useRef<{ handleDecode: () => void; handleClear: () => void }>(null);
   const [decoded, setDecoded] = useState<CargoFormData[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -23,45 +24,59 @@ export default function DecodePage() {
     document.body.removeChild(link);
   };
 
-  return (
-    <main className="space-y-6">
-      <h1 className="text-2xl font-bold">Decode Existing EDI</h1>
+  const handleDecode = () => {
+    if (decoderRef.current) {
+      decoderRef.current.handleDecode();
+    }
+  };
 
-      <div className={`grid gap-6 ${decoded.length > 0 ? "grid-cols-4" : ""}`}>
+  const handleInputChange = () => {
+    setDecoded([]);
+  };
+
+  const handleClearAll = () => {
+    setDecoded([]);
+    if (decoderRef.current) {
+      decoderRef.current.handleClear();
+    }
+  };
+
+  return (
+    <main>
+      <main className="pt-16"></main>
+      <h1 className="text-2xl font-bold mb-6">Decode Existing EDI</h1>
+      <div className="grid md:grid-cols-2 gap-12 items-start">
         {/* Left: Decoder area */}
-        <div className={`${decoded.length > 0 ? "col-span-1" : "col-span-4"}`}>
-          <h2 className="text-xl font-semibold">EDI Input</h2>
-          <EdiDecoder ref={decoderRef} onDecode={setDecoded} />
-          <button
-            onClick={() => decoderRef.current?.handleDecode()}
-            className="w-full mt-4 bg-gray-800 text-white py-2 rounded-md text-sm hover:bg-gray-700 transition"
-          >
-             {loading ? "Decoding..." : "Decode EDI"}
-          </button>
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold">EDI Input</h2>
+            <button
+              onClick={handleClearAll}
+              className="text-sm text-gray-800 border border-gray-300 px-3 py-1 rounded hover:bg-gray-100 hover:border-gray-400 transition"
+            >
+              Clear All
+            </button>
+          </div>
+          <EdiDecoder ref={decoderRef} onDecode={setDecoded} onInputChange={handleInputChange} />
+          <div className="flex flex-col gap-3 sticky bottom-0 bg-transparent pb-4 pt-2">
+            <button
+              onClick={handleDecode}
+              className="w-full bg-gray-800 text-white py-2 rounded-md text-sm hover:bg-gray-700 transition"
+            >
+              {loading ? "Decoding..." : "Decode EDI"}
+            </button>
+          </div>
         </div>
 
-        {/* Right: Cards + JSON */}
-        {decoded.length > 0 && (
-          <div className="col-span-3 space-y-4">
-            {/* Header with download */}
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">Decoded Cargo Details</h2>
-              <button
-                onClick={handleDownloadJson}
-                className="text-sm underline text-gray-600 hover:text-black"
-              >
-                Download JSON
-              </button>
-            </div>
-
-            {/* Card list */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {decoded.map((item, idx) => (
-                <CargoCard key={idx} data={item} index={idx} />
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Right: Output Panel */}
+        <OutputPanel
+          ediOutput={decoded.length > 0 ? JSON.stringify(decoded, null, 2) : ""}
+          onDownload={handleDownloadJson}
+          onCopy={() => navigator.clipboard.writeText(JSON.stringify(decoded, null, 2))}
+          title="Decoded EDI Message"
+          downloadText="Download JSON"
+          placeholder="Decoded EDI will appear here in JSON format..."
+        />
       </div>
     </main>
   );

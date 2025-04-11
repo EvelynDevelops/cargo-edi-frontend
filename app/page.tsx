@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import CargoFormItem, { CargoFormData } from "@/components/CargoFormItem";
-import EdiOutputPanel from "@/components/EdiOutputPanel";
+import EdiOutputPanel from "@/components/OutputPanel";
 import ConfirmationModal from "@/components/ConfirmationModal";
 
 export default function HomePage() {
@@ -67,6 +67,7 @@ export default function HomePage() {
         house_bill_of_lading_number: "",
       },
     ]);
+    setEdiOutput("");
   };
 
   // Remove a cargo item
@@ -158,7 +159,7 @@ export default function HomePage() {
   };
 
   return (
-    <main>
+    <main className="pt-16">
       <h1 className="text-2xl font-bold mb-6">Cargo EDI Generator</h1>
       <div className="grid md:grid-cols-2 gap-12 items-start">
         {/* Left: Cargo input forms */}
@@ -210,6 +211,8 @@ export default function HomePage() {
           ediOutput={ediOutput}
           onDownload={handleDownload}
           onCopy={handleCopy}
+          title="Generated EDI Message"
+          downloadText="Download .edi"
         />
       </div>
 
