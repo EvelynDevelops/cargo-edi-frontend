@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import EdiDecoder from "@/components/EdiDecoder";
+import EdiDecoder from "@/components/EdiTextEditor";
 import { CargoFormData } from "@/components/CargoFormItem";
 import OutputPanel from "../../components/OutputPanel";
 
