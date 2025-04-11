@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import CrossIcon from "../public/icons/CrossIcon";
 
 export type CargoFormData = {
   cargo_type: "FCX" | "LCL" | "FCL";
@@ -88,9 +89,9 @@ const CargoFormItem: React.FC<Props> = ({ index, data, onChange, onDelete, onVal
           <button
             type="button"
             onClick={onDelete}
-            className="border border-red-500 text-red-500 text-sm px-3 py-1 rounded hover:bg-red-50 transition"
+            className="text-gray-700 transition"
           >
-            Delete
+            <CrossIcon className="w-6 h-6 hover:scale-110 hover:font-bold" />
           </button>
         )}
       </div>

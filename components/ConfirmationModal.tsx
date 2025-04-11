@@ -60,10 +60,16 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   }, 0);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl w-[90vw] h-[90vh] flex flex-col overflow-hidden">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-xl w-[90vw] h-[90vh] flex flex-col overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Modal header */}
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-4 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800">Confirm Cargo Information</h2>
           <p className="text-gray-600 mt-1">Please review the cargo information before generating EDI.</p>
         </div>
@@ -72,8 +78,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         <div className="flex-1 overflow-y-auto p-6">
           {/* Cargo summary section */}
           <div className="mb-4">
-            <h3 className="text-lg font-medium text-gray-800 mb-2">Cargo Items Summary</h3>
-            <div className="text-sm text-gray-600">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">Cargo Items Summary:</h3>
+            <div className="text-m text-gray-600">
               <ul className="list-disc pl-5 space-y-1">
                 <li>Number of cargo items: <strong>{cargoItems.length}</strong></li>
                 <li>Total number of packages: <strong>{totalPackages}</strong></li>

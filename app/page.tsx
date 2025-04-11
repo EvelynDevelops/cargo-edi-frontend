@@ -51,6 +51,8 @@ export default function HomePage() {
     const newItems = [...cargoItems];
     newItems[index] = updated;
     setCargoItems(newItems);
+    // clear the output due to form changes
+    setEdiOutput("");
   };
 
   // Add a new cargo item
@@ -71,6 +73,8 @@ export default function HomePage() {
   const handleDelete = (index: number) => {
     if (cargoItems.length > 1) {
       setCargoItems((prev) => prev.filter((_, i) => i !== index));
+      // clear the form data
+      setEdiOutput("");
     }
   };
 
@@ -139,13 +143,36 @@ export default function HomePage() {
     setIsModalOpen(false);
   };
 
+  // Clear all cargo items
+  const handleClearAll = () => {
+    setCargoItems([
+      {
+        cargo_type: "LCL",
+        number_of_packages: 1,
+        container_number: "",
+        master_bill_of_lading_number: "",
+        house_bill_of_lading_number: "",
+      },
+    ]);
+    setEdiOutput("");
+  };
+
   return (
     <main>
       <h1 className="text-2xl font-bold mb-6">Cargo EDI Generator</h1>
       <div className="grid md:grid-cols-2 gap-12 items-start">
         {/* Left: Cargo input forms */}
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold">Cargo Information</h2>
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold">Cargo Information</h2>
+            <button
+              type="button"
+              onClick={handleClearAll}
+              className="text-sm text-gray-800 border border-gray-300 px-3 py-1 rounded hover:bg-gray-100 hover:border-gray-400 transition"
+            >
+              Clear All
+            </button>
+          </div>
 
           {/* List of CargoFormItem components */}
           {cargoItems.map((item, index) => (
