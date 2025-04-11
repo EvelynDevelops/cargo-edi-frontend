@@ -10,9 +10,10 @@ import {
 
 type Props = {
   onDecode: (result: any[]) => void;
+  onInputChange?: () => void;
 };
 
-const EdiDecoder = forwardRef(function EdiDecoder({ onDecode }: Props, ref) {
+const EdiDecoder = forwardRef(function EdiDecoder({ onDecode, onInputChange }: Props, ref) {
   const [input, setInput] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -39,7 +40,10 @@ const EdiDecoder = forwardRef(function EdiDecoder({ onDecode }: Props, ref) {
     }
   };
 
-  useImperativeHandle(ref, () => ({ handleDecode }));
+  useImperativeHandle(ref, () => ({
+    handleDecode,
+    handleClear: () => setInput("")
+  }));
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -48,14 +52,19 @@ const EdiDecoder = forwardRef(function EdiDecoder({ onDecode }: Props, ref) {
     }
   }, [input]);
 
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+    if (onInputChange) onInputChange();
+  };
+
   return (
-    <div className="bg-white rounded-xl px-1 py-3 mb-1 space-y-3">
+    <div className="bg-transparent rounded-lg mb-1 space-y-2">
       <textarea
         ref={textareaRef}
-        className="w-full min-h-100 max-h-140 border border-gray-200 p-3 text-sm font-mono rounded-md resize-none overflow-auto"
-        placeholder="Paste existing EDI here to parse it into the form above"
+        className="w-full min-h-135 border border-gray-200 p-3 text-sm font-mono rounded-md resize-none overflow-auto"
+        placeholder="Paste existing EDI here to parse it"
         value={input}
-        onChange={(e) => setInput(e.target.value)}
+        onChange={handleChange}
       />
       {error && <p className="text-sm text-red-500">{error}</p>}
     </div>
