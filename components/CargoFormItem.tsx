@@ -96,19 +96,33 @@ const CargoFormItem = forwardRef<CargoFormRef, Props>(({
     if (field === "package_count") {
       const numValue = value === "" ? undefined : Number(value);
       updated[field] = numValue;
-      newErrors[field] = numValue === undefined && validationRules[field].required ? 
-        validationRules[field].message || "Package count is required" : "";
+      
+      // 检查是否为小数
+      //check the number if it is a whole number
+      if (numValue !== undefined && !Number.isInteger(numValue)) {
+        newErrors[field] = "Package count must be a whole number";
+      } else if (numValue !== undefined && numValue < 1) {
+        newErrors[field] = "Number of packages must be at least 1";
+      } else {
+        newErrors[field] = numValue === undefined && validationRules[field].required ? 
+          validationRules[field].message || "Package count is required" : "";
+      }
     } else if (field !== "cargo_type" && typeof value === "string") {
       const rule = validationRules[field];
       const trimmedValue = value.trim();
-      const isValid = value === "" || !rule.pattern || rule.pattern.test(trimmedValue);
       
-      newErrors[field] = isValid ? "" : (rule.message || `Invalid ${field.replaceAll("_", " ")}`);
-      
+      // always update the value, even if it is invalid
       if (value === "" || trimmedValue === "") {
         (updated as any)[field] = undefined;
-      } else if (isValid) {
-        (updated as any)[field] = trimmedValue;
+      } else {
+        (updated as any)[field] = value;
+      }
+      
+      // check if the value is valid
+      if (rule.pattern && !rule.pattern.test(trimmedValue) && trimmedValue !== "") {
+        newErrors[field] = rule.message || `Invalid ${field.replaceAll("_", " ")}`;
+      } else {
+        newErrors[field] = "";
       }
     } else if (field === "cargo_type") {
       const newValue = value === "" ? undefined : value as CargoType;
@@ -187,7 +201,7 @@ const CargoFormItem = forwardRef<CargoFormRef, Props>(({
           <input
             type="number"
             min={1}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+            className={`w-full border ${errors.package_count ? 'border-red-500' : 'border-gray-300'} rounded-md px-3 py-2 text-sm`}
             value={data.package_count ?? ""}
             onChange={(e) => handleFieldChange("package_count", e.target.value === "" ? "" : Number(e.target.value))}
             onBlur={(e) => handleBlur("package_count", e.target.value === "" ? "" : Number(e.target.value))}
