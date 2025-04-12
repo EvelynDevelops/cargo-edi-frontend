@@ -4,9 +4,10 @@ import { useRef, useState } from "react";
 import EdiDecoder from "@/components/EdiTextEditor";
 import { CargoFormData } from "@/components/CargoFormItem";
 import OutputPanel from "../../components/OutputPanel";
+import { Button } from "@/components/ui/button";
 
 // Define response types
-interface ApiResponse {
+interface IApiResponse {
   cargo_items?: any[];
   logs?: string[];
   error?: string;
@@ -55,7 +56,7 @@ export default function DecodePage() {
       });
       
       let responseText = await res.text();
-      let responseData: ApiResponse;
+      let responseData: IApiResponse;
       
       try {
         responseData = JSON.parse(responseText);
@@ -131,12 +132,14 @@ export default function DecodePage() {
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold">EDI Input</h2>
-            <button
+            <Button
+              variant="outline"
+              size="sm"
               onClick={handleClearAll}
-              className="text-sm text-gray-800 border border-gray-300 px-3 py-1 rounded hover:bg-gray-100 hover:border-gray-400 transition"
+              type="button"
             >
               Clear All
-            </button>
+            </Button>
           </div>
           <EdiDecoder 
             ref={decoderRef} 
@@ -147,12 +150,15 @@ export default function DecodePage() {
             setError={setError}
           />
           <div className="flex flex-col gap-3 sticky bottom-0 bg-transparent pb-4 pt-2">
-            <button
+            <Button
+              variant="default"
               onClick={() => decoderRef.current?.handleDecode()}
-              className="w-full bg-gray-800 text-white py-2 rounded-md text-sm hover:bg-gray-700 transition"
+              className="w-full"
+              disabled={loading}
+              type="button"
             >
               {loading ? "Decoding..." : "Decode EDI"}
-            </button>
+            </Button>
           </div>
         </div>
 

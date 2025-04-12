@@ -7,16 +7,18 @@ import { CargoFormData } from "@/components/CargoFormItem";
  * Props for the CargoCard component
  * @property {CargoFormData} data - The cargo data to display
  * @property {number} index - The index of the cargo item in the list
+ * @property {boolean} readOnly - Whether the card is in read-only mode
  */
 type Props = {
   data: CargoFormData;
   index: number;
+  readOnly?: boolean;
 };
 
 /**
  * CargoCard component displays cargo information in a card format
  */
-const CargoCard: React.FC<Props> = ({ data, index }) => {
+const CargoCard: React.FC<Props> = ({ data, index, readOnly = true }) => {
   return (
     <div className="bg-white border border-gray-300 rounded-xl px-6 py-4 shadow-sm space-y-2 relative w-[420px]">
       {/* Card header with cargo item number */}
@@ -32,7 +34,7 @@ const CargoCard: React.FC<Props> = ({ data, index }) => {
           <input
             type="text"
             value={data.cargo_type}
-            disabled
+            disabled={readOnly}
             className="border border-gray-300 rounded px-2 py-0.5 w-48 h-6 bg-gray-50 text-gray-700"
           />
         </div>
@@ -43,7 +45,7 @@ const CargoCard: React.FC<Props> = ({ data, index }) => {
           <input
             type="number"
             value={data.package_count}
-            disabled
+            disabled={readOnly}
             className="border border-gray-300 rounded px-2 py-0.5 w-48 h-6 bg-gray-50 text-gray-700"
           />
         </div>
@@ -54,7 +56,7 @@ const CargoCard: React.FC<Props> = ({ data, index }) => {
           <input
             type="text"
             value={data.container_number || ""}
-            disabled
+            disabled={readOnly}
             className="border border-gray-300 rounded px-2 py-0.5 w-48 h-6 bg-gray-50 text-gray-700"
           />
         </div>
@@ -65,7 +67,7 @@ const CargoCard: React.FC<Props> = ({ data, index }) => {
           <input
             type="text"
             value={data.master_bill_number || ""}
-            disabled
+            disabled={readOnly}
             className="border border-gray-300 rounded px-2 py-0.5 w-48 h-6 bg-gray-50 text-gray-700"
           />
         </div>
@@ -76,7 +78,7 @@ const CargoCard: React.FC<Props> = ({ data, index }) => {
           <input
             type="text"
             value={data.house_bill_number || ""}
-            disabled
+            disabled={readOnly}
             className="border border-gray-300 rounded px-2 py-0.5 w-48 h-6 bg-gray-50 text-gray-700"
           />
         </div>

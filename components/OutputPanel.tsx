@@ -2,6 +2,7 @@
 
 import React from "react";
 import CopyButton from "./CopyButton";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   ediOutput: string;
@@ -21,12 +22,14 @@ const OutputPanel: React.FC<Props> = ({ ediOutput, onDownload, onCopy, title, do
         <h2 className="text-xl font-semibold">{title}</h2>
         {ediOutput && (
           <div className="flex gap-2">
-            <button
+            <Button
+              variant="outline"
+              size="sm"
               onClick={onDownload}
-              className="text-sm text-gray-800 border border-gray-300 px-3 py-1 rounded hover:bg-gray-100 hover:border-gray-400 transition"
+              type="button"
             >
               {downloadText}
-            </button>
+            </Button>
           </div>
         )}
       </div>

@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import CargoFormItem, { CargoFormData, CargoFormErrors, CargoFormRef } from "@/components/CargoFormItem";
 import EdiOutputPanel from "@/components/OutputPanel";
 import ConfirmationModal from "@/components/ConfirmationModal";
+import { Button } from "@/components/ui/button";
 
 export default function HomePage() {
   // Initial cargo items list
@@ -257,13 +258,14 @@ export default function HomePage() {
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold">Cargo Information</h2>
-            <button
-              type="button"
+            <Button
+              variant="outline"
+              size="sm"
               onClick={handleClearAll}
-              className="text-sm text-gray-800 border border-gray-300 px-3 py-1 rounded hover:bg-gray-100 hover:border-gray-400 transition"
+              type="button"
             >
               Clear All
-            </button>
+            </Button>
           </div>
 
           {/* List of CargoFormItem components */}
@@ -284,20 +286,23 @@ export default function HomePage() {
 
           {/* Add / Submit buttons */}
           <div className="flex flex-col gap-3 sticky bottom-0 bg-transparent pb-4 pt-2">
-            <button
-              type="button"
+            <Button
+              variant="outline"
               onClick={handleAdd}
-              className="w-full bg-white border border-gray-800 text-gray-800 py-2 rounded-md text-sm hover:bg-gray-100 transition"
+              className="w-full"
+              type="button"
             >
               Add Cargo Item
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              variant="default"
               onClick={handleOpenModal}
-              className="w-full bg-gray-800 text-white py-2 rounded-md text-sm hover:bg-gray-700 transition"
+              className="w-full"
+              disabled={loading}
+              type="button"
             >
               {loading ? "Generating..." : "Generate EDI"}
-            </button>
+            </Button>
             {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
           </div>
         </div>

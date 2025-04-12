@@ -1,6 +1,7 @@
 import React from 'react';
 import type { CargoFormData } from '@/components/CargoFormItem';
 import CargoCard from '@/components/CargoCard';
+import { Button } from "@/components/ui/button";
 
 /**
  * Props for the ConfirmationModal component
@@ -103,18 +104,20 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
         {/* Modal footer with action buttons */}
         <div className="p-6 border-t border-gray-200 flex justify-end space-x-3">
-          <button
+          <Button
+            variant="outline"
             onClick={onClose}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+            type="button"
           >
             Back to Edit
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="default"
             onClick={handleConfirm}
-            className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
+            type="button"
           >
             Confirm & Generate EDI
-          </button>
+          </Button>
         </div>
       </div>
     </div>
