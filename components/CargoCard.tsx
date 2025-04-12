@@ -63,7 +63,7 @@ const CargoCard: React.FC<Props> = ({ data, index, onUpdate, readOnly = false })
   };
 
   return (
-    <div className="bg-white border border-gray-300 rounded-xl px-6 py-4 shadow-sm space-y-2 relative">
+    <div className="bg-white border border-gray-300 rounded-xl px-6 py-4 shadow-sm space-y-2 relative w-[420px]">
       
       {/* Card header with cargo item number */}
       <h3 className="text-lg font-semibold text-gray-800 bg-gray-100 px-4 py-2 -mx-6 -mt-4 rounded-t-xl">
@@ -137,4 +137,4 @@ const CargoCard: React.FC<Props> = ({ data, index, onUpdate, readOnly = false })
   );
 };
 
-export default CargoCard;
+export default CargoCard; 
