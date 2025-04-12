@@ -41,9 +41,11 @@ export default function HomePage() {
     try {
       await navigator.clipboard.writeText(ediOutput);
     } catch (err) {
+      //todo: use a formal logging library
       console.error("Failed to copy", err);
     }
   };
+  
 
   // Update cargoItems list when user edits a form field
   const handleChange = (index: number, updated: CargoFormData) => {
@@ -70,6 +72,7 @@ export default function HomePage() {
   // Remove a cargo item
   const handleDelete = (index: number) => {
     if (cargoItems.length > 1) {
+      //splice 
       setCargoItems((prev) => prev.filter((_, i) => i !== index));
       // clear the form data
       setEdiOutput("");
@@ -88,6 +91,7 @@ export default function HomePage() {
   const validateAllInputs = () => {
     let hasErrors = false;
     const newErrors: { [key: number]: CargoFormErrors } = {};
+    let firstErrorField: { index: number; field: keyof CargoFormData } | null = null;
 
     cargoItems.forEach((item, index) => {
       const errors = {
@@ -98,20 +102,39 @@ export default function HomePage() {
         house_bill_number: "",
       };
       
+      // Track first error field
+      if (!firstErrorField) {
+        for (const [field, error] of Object.entries(errors)) {
+          if (error) {
+            firstErrorField = { index, field: field as keyof CargoFormData };
+            break;
+          }
+        }
+      }
+      
       // Check optional fields format
       if (item.container_number && !isAlphaNumeric(item.container_number)) {
         errors.container_number = "Container number can only contain letters and numbers";
         hasErrors = true;
+        if (!firstErrorField) {
+          firstErrorField = { index, field: 'container_number' };
+        }
       }
       
       if (item.master_bill_number && !isAlphaNumeric(item.master_bill_number)) {
         errors.master_bill_number = "Master bill number can only contain letters and numbers";
         hasErrors = true;
+        if (!firstErrorField) {
+          firstErrorField = { index, field: 'master_bill_number' };
+        }
       }
       
       if (item.house_bill_number && !isAlphaNumeric(item.house_bill_number)) {
         errors.house_bill_number = "House bill number can only contain letters and numbers";
         hasErrors = true;
+        if (!firstErrorField) {
+          firstErrorField = { index, field: 'house_bill_number' };
+        }
       }
 
       if (errors.cargo_type || errors.package_count) {
@@ -130,6 +153,15 @@ export default function HomePage() {
         formRef.setFieldErrors(errors);
       }
     });
+
+    // Scroll to first error if exists
+    if (firstErrorField) {
+      const element = document.querySelector(`[data-form-index="${firstErrorField.index}"][data-field="${firstErrorField.field}"]`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        (element as HTMLElement).focus();
+      }
+    }
 
     return !hasErrors;
   };
@@ -155,6 +187,7 @@ export default function HomePage() {
       });
 
       if (!response.ok) {
+        //161 and 165
         const errorData = await response.json();
         throw new Error(errorData.detail?.message || errorData.message || "Failed to generate EDI");
       }

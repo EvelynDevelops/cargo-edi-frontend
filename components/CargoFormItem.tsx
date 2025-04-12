@@ -168,6 +168,8 @@ const CargoFormItem = forwardRef<CargoFormRef, Props>(({
             value={data.cargo_type || ""}
             onChange={(e) => handleFieldChange("cargo_type", e.target.value as CargoType)}
             onBlur={(e) => handleBlur("cargo_type", e.target.value)}
+            data-form-index={index}
+            data-field="cargo_type"
           >
             <option value="" disabled className="text-gray-500">Select cargo type</option>
             <option value="FCX" className="text-gray-900">FCX</option>
@@ -190,6 +192,8 @@ const CargoFormItem = forwardRef<CargoFormRef, Props>(({
             onChange={(e) => handleFieldChange("package_count", e.target.value === "" ? "" : Number(e.target.value))}
             onBlur={(e) => handleBlur("package_count", e.target.value === "" ? "" : Number(e.target.value))}
             placeholder="Enter number of packages"
+            data-form-index={index}
+            data-field="package_count"
           />
           {errors.package_count && (
             <p className="text-red-500 text-sm mt-1">{errors.package_count}</p>
@@ -201,10 +205,13 @@ const CargoFormItem = forwardRef<CargoFormRef, Props>(({
           <label className="block text-sm font-medium text-gray-700 mb-1">Container Number (Optional)</label>
           <input
             type="text"
-            value={data.container_number || ""}
-            onChange={(e) => handleFieldChange("container_number", e.target.value as string)}
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-            placeholder="Enter container number"
+            value={data.container_number ?? ""}
+            onChange={(e) => handleFieldChange("container_number", e.target.value)}
+            onBlur={(e) => handleBlur("container_number", e.target.value)}
+            placeholder="Enter container number (optional)"
+            data-form-index={index}
+            data-field="container_number"
           />
           {errors.container_number && (
             <p className="text-red-500 text-sm mt-1">{errors.container_number}</p>
@@ -216,10 +223,13 @@ const CargoFormItem = forwardRef<CargoFormRef, Props>(({
           <label className="block text-sm font-medium text-gray-700 mb-1">Master Bill Number (Optional)</label>
           <input
             type="text"
-            value={data.master_bill_number || ""}
-            onChange={(e) => handleFieldChange("master_bill_number", e.target.value as string)}
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-            placeholder="Enter master bill number"
+            value={data.master_bill_number ?? ""}
+            onChange={(e) => handleFieldChange("master_bill_number", e.target.value)}
+            onBlur={(e) => handleBlur("master_bill_number", e.target.value)}
+            placeholder="Enter master bill number (optional)"
+            data-form-index={index}
+            data-field="master_bill_number"
           />
           {errors.master_bill_number && (
             <p className="text-red-500 text-sm mt-1">{errors.master_bill_number}</p>
@@ -231,10 +241,13 @@ const CargoFormItem = forwardRef<CargoFormRef, Props>(({
           <label className="block text-sm font-medium text-gray-700 mb-1">House Bill Number (Optional)</label>
           <input
             type="text"
-            value={data.house_bill_number || ""}
-            onChange={(e) => handleFieldChange("house_bill_number", e.target.value as string)}
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-            placeholder="Enter house bill number"
+            value={data.house_bill_number ?? ""}
+            onChange={(e) => handleFieldChange("house_bill_number", e.target.value)}
+            onBlur={(e) => handleBlur("house_bill_number", e.target.value)}
+            placeholder="Enter house bill number (optional)"
+            data-form-index={index}
+            data-field="house_bill_number"
           />
           {errors.house_bill_number && (
             <p className="text-red-500 text-sm mt-1">{errors.house_bill_number}</p>
