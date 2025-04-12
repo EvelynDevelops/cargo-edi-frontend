@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import CargoFormItem, { CargoFormData } from "@/components/CargoFormItem";
+import { useState, useRef } from "react";
+import CargoFormItem, { CargoFormData, CargoFormErrors, CargoFormRef } from "@/components/CargoFormItem";
 import EdiOutputPanel from "@/components/OutputPanel";
 import ConfirmationModal from "@/components/ConfirmationModal";
 
@@ -9,11 +9,9 @@ export default function HomePage() {
   // Initial cargo items list
   const [cargoItems, setCargoItems] = useState<CargoFormData[]>([
     {
-      cargo_type: "LCL",
-      number_of_packages: 1,
       container_number: "",
-      master_bill_of_lading_number: "",
-      house_bill_of_lading_number: "",
+      master_bill_number: "",
+      house_bill_number: "",
     },
   ]);
 
@@ -22,6 +20,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formErrors, setFormErrors] = useState<{ [key: number]: CargoFormErrors }>({});
 
   // Check if string only contains letters and numbers
   const isAlphaNumeric = (text: string) => /^[a-zA-Z0-9]*$/.test(text);
@@ -60,11 +59,9 @@ export default function HomePage() {
     setCargoItems((prev) => [
       ...prev,
       {
-        cargo_type: "LCL",
-        number_of_packages: 1,
         container_number: "",
-        master_bill_of_lading_number: "",
-        house_bill_of_lading_number: "",
+        master_bill_number: "",
+        house_bill_number: "",
       },
     ]);
     setEdiOutput("");
@@ -79,25 +76,67 @@ export default function HomePage() {
     }
   };
 
-  // Validate all optional fields before submission
-  const validateAllInputs = (): boolean => {
-    for (let i = 0; i < cargoItems.length; i++) {
-      const item = cargoItems[i];
-      if (
-        (item.container_number && !isAlphaNumeric(item.container_number)) ||
-        (item.master_bill_of_lading_number && !isAlphaNumeric(item.master_bill_of_lading_number)) ||
-        (item.house_bill_of_lading_number && !isAlphaNumeric(item.house_bill_of_lading_number))
-      ) {
-        return false;
+  // Store refs for all form items
+  const formRefs = useRef<(CargoFormRef | null)[]>([]);
+
+  // Register form ref
+  const registerFormRef = (index: number, ref: CargoFormRef) => {
+    formRefs.current[index] = ref;
+  };
+
+  // Validate all fields before submission
+  const validateAllInputs = () => {
+    let hasErrors = false;
+    const newErrors: { [key: number]: CargoFormErrors } = {};
+
+    cargoItems.forEach((item, index) => {
+      const errors = {
+        cargo_type: !item.cargo_type ? "Cargo type is required" : "",
+        package_count: !item.package_count ? "Package count is required" : "",
+        container_number: "",
+        master_bill_number: "",
+        house_bill_number: "",
+      };
+      
+      // Check optional fields format
+      if (item.container_number && !isAlphaNumeric(item.container_number)) {
+        errors.container_number = "Container number can only contain letters and numbers";
+        hasErrors = true;
       }
-    }
-    return true;
+      
+      if (item.master_bill_number && !isAlphaNumeric(item.master_bill_number)) {
+        errors.master_bill_number = "Master bill number can only contain letters and numbers";
+        hasErrors = true;
+      }
+      
+      if (item.house_bill_number && !isAlphaNumeric(item.house_bill_number)) {
+        errors.house_bill_number = "House bill number can only contain letters and numbers";
+        hasErrors = true;
+      }
+
+      if (errors.cargo_type || errors.package_count) {
+        hasErrors = true;
+      }
+
+      if (Object.values(errors).some(error => error !== "")) {
+        newErrors[index] = errors;
+      }
+    });
+
+    // Update all form items with their errors
+    Object.entries(newErrors).forEach(([index, errors]) => {
+      const formRef = formRefs.current[Number(index)];
+      if (formRef) {
+        formRef.setFieldErrors(errors);
+      }
+    });
+
+    return !hasErrors;
   };
 
   // Submit and generate EDI if all inputs are valid
   const handleSubmit = async () => {
-    const isValid = validateAllInputs();
-    if (!isValid) {
+    if (!validateAllInputs()) {
       alert("Some fields contain invalid characters. Please correct them as indicated in red before submitting.");
       return;
     }
@@ -112,11 +151,12 @@ export default function HomePage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(cargoItems),
+        body: JSON.stringify({ cargo_items: cargoItems }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to generate EDI");
+        const errorData = await response.json();
+        throw new Error(errorData.detail?.message || errorData.message || "Failed to generate EDI");
       }
 
       const data = await response.json();
@@ -131,12 +171,9 @@ export default function HomePage() {
 
   // Open confirmation modal
   const handleOpenModal = () => {
-    const isValid = validateAllInputs();
-    if (!isValid) {
-      alert("Some fields contain invalid characters. Please correct them as indicated in red before submitting.");
-      return;
+    if (validateAllInputs()) {
+      setIsModalOpen(true);
     }
-    setIsModalOpen(true);
   };
 
   // Close confirmation modal
@@ -148,14 +185,35 @@ export default function HomePage() {
   const handleClearAll = () => {
     setCargoItems([
       {
-        cargo_type: "LCL",
-        number_of_packages: 1,
+        cargo_type: undefined,
+        package_count: undefined,
         container_number: "",
-        master_bill_of_lading_number: "",
-        house_bill_of_lading_number: "",
-      },
+        master_bill_number: "",
+        house_bill_number: "",
+      }
     ]);
     setEdiOutput("");
+    setError("");
+    setFormErrors({});
+    formRefs.current.forEach(ref => {
+      if (ref) {
+        ref.setFieldErrors({
+          cargo_type: "",
+          package_count: "",
+          container_number: "",
+          master_bill_number: "",
+          house_bill_number: "",
+        });
+      }
+    });
+  };
+
+  // Handle form errors for each cargo item
+  const handleSetFieldErrors = (index: number) => (errors: CargoFormErrors) => {
+    setFormErrors(prev => ({
+      ...prev,
+      [index]: errors
+    }));
   };
 
   return (
@@ -183,6 +241,11 @@ export default function HomePage() {
               data={item}
               onChange={handleChange}
               onDelete={cargoItems.length > 1 ? () => handleDelete(index) : undefined}
+              ref={(el) => {
+                if (el) {
+                  registerFormRef(index, el);
+                }
+              }}
             />
           ))}
 

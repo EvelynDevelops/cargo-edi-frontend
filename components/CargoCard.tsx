@@ -86,18 +86,18 @@ const CargoCard: React.FC<Props> = ({ data, index, onUpdate, readOnly = false })
         
         {/* Number of Packages field */}
         <div className="flex items-center justify-between">
-          <span className="font-medium whitespace-nowrap mr-4">Packages:</span>
+          <span className="font-medium whitespace-nowrap mr-4">Number of Packages:</span>
           <input
             type="number"
-            min="1"
-            value={isEditing ? editedData.number_of_packages : data.number_of_packages}
-            onChange={(e) => handleChange("number_of_packages", parseInt(e.target.value) || 1)}
+            min={1}
+            value={isEditing ? editedData.package_count : data.package_count}
+            onChange={(e) => handleChange("package_count", parseInt(e.target.value) || 1)}
             disabled={!isEditing || readOnly}
             className={`border border-gray-300 rounded px-2 py-0.5 w-48 h-6 ${!isEditing || readOnly ? "bg-gray-50 text-gray-700" : ""}`}
           />
         </div>
         
-        {/* Container Number field */}
+        {/* Container number field */}
         <div className="flex items-center justify-between">
           <span className="font-medium whitespace-nowrap mr-4">Container number:</span>
           <input
@@ -109,25 +109,25 @@ const CargoCard: React.FC<Props> = ({ data, index, onUpdate, readOnly = false })
           />
         </div>
         
-        {/* Master Bill of Lading Number field */}
+        {/* Master Bill Number field */}
         <div className="flex items-center justify-between">
           <span className="font-medium whitespace-nowrap mr-4">Master Bill number:</span>
           <input
             type="text"
-            value={isEditing ? (editedData.master_bill_of_lading_number || "") : (data.master_bill_of_lading_number || "")}
-            onChange={(e) => handleChange("master_bill_of_lading_number", e.target.value)}
+            value={isEditing ? (editedData.master_bill_number || "") : (data.master_bill_number || "")}
+            onChange={(e) => handleChange("master_bill_number", e.target.value)}
             disabled={!isEditing || readOnly}
             className={`border border-gray-300 rounded px-2 py-0.5 w-48 h-6 ${!isEditing || readOnly ? "bg-gray-50 text-gray-700" : ""}`}
           />
         </div>
         
-        {/* House Bill of Lading Number field */}
+        {/* House Bill Number field */}
         <div className="flex items-center justify-between">
           <span className="font-medium whitespace-nowrap mr-4">House Bill number:</span>
           <input
             type="text"
-            value={isEditing ? (editedData.house_bill_of_lading_number || "") : (data.house_bill_of_lading_number || "")}
-            onChange={(e) => handleChange("house_bill_of_lading_number", e.target.value)}
+            value={isEditing ? (editedData.house_bill_number || "") : (data.house_bill_number || "")}
+            onChange={(e) => handleChange("house_bill_number", e.target.value)}
             disabled={!isEditing || readOnly}
             className={`border border-gray-300 rounded px-2 py-0.5 w-48 h-6 ${!isEditing || readOnly ? "bg-gray-50 text-gray-700" : ""}`}
           />

@@ -1,14 +1,51 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import CrossIcon from "../public/icons/CrossIcon";
 
+export type CargoType = "FCX" | "LCL" | "FCL";
+
 export type CargoFormData = {
-  cargo_type: "FCX" | "LCL" | "FCL";
-  number_of_packages: number;
+  cargo_type?: CargoType;
+  package_count?: number;
   container_number?: string;
-  master_bill_of_lading_number?: string;
-  house_bill_of_lading_number?: string;
+  master_bill_number?: string;
+  house_bill_number?: string;
+};
+
+export type CargoFormErrors = {
+  [K in keyof CargoFormData]: string;
+};
+
+type ValidationRules = {
+  [K in keyof CargoFormData]: {
+    pattern?: RegExp;
+    message?: string;
+    required?: boolean;
+  };
+};
+
+const validationRules: ValidationRules = {
+  cargo_type: {
+    required: true,
+    message: "Cargo type is required"
+  },
+  package_count: {
+    required: true,
+    message: "Package count is required"
+  },
+  container_number: {
+    pattern: /^[a-zA-Z0-9]*$/,
+    message: "Container number can only contain letters and numbers (no spaces)"
+  },
+  master_bill_number: {
+    pattern: /^[a-zA-Z0-9]*$/,
+    message: "Master bill number can only contain letters and numbers (no spaces)"
+  },
+  house_bill_number: {
+    pattern: /^[a-zA-Z0-9]*$/,
+    message: "House bill number can only contain letters and numbers (no spaces)"
+  }
 };
 
 type Props = {
@@ -19,27 +56,30 @@ type Props = {
   onValidate?: (index: number, isValid: boolean) => void;
 };
 
-const CargoFormItem: React.FC<Props> = ({ index, data, onChange, onDelete, onValidate }) => {
-  const [errors, setErrors] = useState({
+export type CargoFormRef = {
+  setFieldErrors: (errors: CargoFormErrors) => void;
+};
+
+const CargoFormItem = forwardRef<CargoFormRef, Props>(({ 
+  index, 
+  data, 
+  onChange, 
+  onDelete, 
+  onValidate
+}, ref) => {
+  const [errors, setErrors] = useState<CargoFormErrors>({
+    cargo_type: "",
     container_number: "",
-    master_bill_of_lading_number: "",
-    house_bill_of_lading_number: "",
-    number_of_packages: "",
+    master_bill_number: "",
+    house_bill_number: "",
+    package_count: "",
   });
 
-  // Check if all fields are valid (used to call onValidate)
-  const validateAllFields = (updated: CargoFormData) => {
-    const fieldsToCheck: (keyof CargoFormData)[] = [
-      "container_number",
-      "master_bill_of_lading_number",
-      "house_bill_of_lading_number",
-    ];
-    
-    return fieldsToCheck.every((field) => {
-      const val = updated[field];
-      return !val || /^[a-zA-Z0-9]*$/.test(val as string);
-    });    
-  };
+  useImperativeHandle(ref, () => ({
+    setFieldErrors: (newErrors: CargoFormErrors) => {
+      setErrors(newErrors);
+    }
+  }));
 
   // Trigger validation report to parent when errors change
   useEffect(() => {
@@ -49,36 +89,59 @@ const CargoFormItem: React.FC<Props> = ({ index, data, onChange, onDelete, onVal
     }
   }, [errors, index, onValidate]);
 
-  const handleFieldChange = (field: keyof CargoFormData, value: any) => {
-    const updated = { ...data, [field]: value };
-
-    if (
-      ["container_number", "master_bill_of_lading_number", "house_bill_of_lading_number"].includes(field)
-    ) {
-      const isValid = value === "" || /^[a-zA-Z0-9]*$/.test(value);
-      setErrors((prev) => ({
-        ...prev,
-        [field]: isValid ? "" : `${field.replaceAll("_", " ")} can only contain letters and numbers`,
-      }));
-    } else if (field === "number_of_packages") {
-      setErrors((prev) => ({
-        ...prev,
-        [field]: "",
-      }));
+  const handleFieldChange = (field: keyof CargoFormData, value: string | number) => {
+    const updated = { ...data };
+    const newErrors = { ...errors };
+    
+    if (field === "package_count") {
+      const numValue = value === "" ? undefined : Number(value);
+      updated[field] = numValue;
+      newErrors[field] = numValue === undefined && validationRules[field].required ? 
+        validationRules[field].message || "Package count is required" : "";
+    } else if (field !== "cargo_type" && typeof value === "string") {
+      const rule = validationRules[field];
+      const trimmedValue = value.trim();
+      const isValid = value === "" || !rule.pattern || rule.pattern.test(trimmedValue);
+      
+      newErrors[field] = isValid ? "" : (rule.message || `Invalid ${field.replaceAll("_", " ")}`);
+      
+      if (value === "" || trimmedValue === "") {
+        (updated as any)[field] = undefined;
+      } else if (isValid) {
+        (updated as any)[field] = trimmedValue;
+      }
+    } else if (field === "cargo_type") {
+      const newValue = value === "" ? undefined : value as CargoType;
+      updated.cargo_type = newValue;
+      newErrors[field] = newValue === undefined && validationRules[field].required ?
+        validationRules[field].message || "Cargo type is required" : "";
     }
 
+    setErrors(newErrors);
     onChange(index, updated);
   };
 
   const handleBlur = (field: keyof CargoFormData, value: any) => {
-    if (field === "number_of_packages") {
-      if (value === "" || value < 1) {
-        setErrors((prev) => ({
-          ...prev,
-          [field]: "Number of packages must be at least 1",
-        }));
+    const newErrors = { ...errors };
+    
+    if (field === "package_count") {
+      if (value === "" || value === undefined) {
+        newErrors[field] = validationRules[field].required ? 
+          validationRules[field].message || "Package count is required" : "";
+      } else if (value < 1) {
+        newErrors[field] = "Number of packages must be at least 1";
+      }
+    } else if (field === "cargo_type" && validationRules[field].required) {
+      if (!data.cargo_type) {
+        newErrors[field] = validationRules[field].message || "Cargo type is required";
       }
     }
+    
+    setErrors(newErrors);
+  };
+
+  const isValidCargoType = (value: string): value is CargoType => {
+    return ["FCX", "LCL", "FCL"].includes(value);
   };
 
   return (
@@ -101,14 +164,19 @@ const CargoFormItem: React.FC<Props> = ({ index, data, onChange, onDelete, onVal
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Cargo Type</label>
           <select
-            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-            value={data.cargo_type}
-            onChange={(e) => handleFieldChange("cargo_type", e.target.value)}
+            className={`w-full border border-gray-300 rounded-md px-3 py-2 text-sm ${data.cargo_type ? 'text-gray-900' : 'text-gray-500'}`}
+            value={data.cargo_type || ""}
+            onChange={(e) => handleFieldChange("cargo_type", e.target.value as CargoType)}
+            onBlur={(e) => handleBlur("cargo_type", e.target.value)}
           >
-            <option value="FCX">FCX</option>
-            <option value="LCL">LCL</option>
-            <option value="FCL">FCL</option>
+            <option value="" disabled className="text-gray-500">Select cargo type</option>
+            <option value="FCX" className="text-gray-900">FCX</option>
+            <option value="LCL" className="text-gray-900">LCL</option>
+            <option value="FCL" className="text-gray-900">FCL</option>
           </select>
+          {errors.cargo_type && (
+            <p className="text-red-500 text-sm mt-1">{errors.cargo_type}</p>
+          )}
         </div>
 
         {/* Number of Packages */}
@@ -118,12 +186,13 @@ const CargoFormItem: React.FC<Props> = ({ index, data, onChange, onDelete, onVal
             type="number"
             min={1}
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-            value={data.number_of_packages || ""}
-            onChange={(e) => handleFieldChange("number_of_packages", e.target.value === "" ? "" : Number(e.target.value))}
-            onBlur={(e) => handleBlur("number_of_packages", e.target.value === "" ? "" : Number(e.target.value))}
+            value={data.package_count ?? ""}
+            onChange={(e) => handleFieldChange("package_count", e.target.value === "" ? "" : Number(e.target.value))}
+            onBlur={(e) => handleBlur("package_count", e.target.value === "" ? "" : Number(e.target.value))}
+            placeholder="Enter number of packages"
           />
-          {errors.number_of_packages && (
-            <p className="text-red-500 text-sm mt-1">{errors.number_of_packages}</p>
+          {errors.package_count && (
+            <p className="text-red-500 text-sm mt-1">{errors.package_count}</p>
           )}
         </div>
 
@@ -133,7 +202,7 @@ const CargoFormItem: React.FC<Props> = ({ index, data, onChange, onDelete, onVal
           <input
             type="text"
             value={data.container_number || ""}
-            onChange={(e) => handleFieldChange("container_number", e.target.value)}
+            onChange={(e) => handleFieldChange("container_number", e.target.value as string)}
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
             placeholder="Enter container number"
           />
@@ -144,36 +213,36 @@ const CargoFormItem: React.FC<Props> = ({ index, data, onChange, onDelete, onVal
 
         {/* Master Bill */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Master Bill of Lading Number (Optional)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Master Bill Number (Optional)</label>
           <input
             type="text"
-            value={data.master_bill_of_lading_number || ""}
-            onChange={(e) => handleFieldChange("master_bill_of_lading_number", e.target.value)}
+            value={data.master_bill_number || ""}
+            onChange={(e) => handleFieldChange("master_bill_number", e.target.value as string)}
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
             placeholder="Enter master bill number"
           />
-          {errors.master_bill_of_lading_number && (
-            <p className="text-red-500 text-sm mt-1">{errors.master_bill_of_lading_number}</p>
+          {errors.master_bill_number && (
+            <p className="text-red-500 text-sm mt-1">{errors.master_bill_number}</p>
           )}
         </div>
 
         {/* House Bill */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">House Bill of Lading Number (Optional)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">House Bill Number (Optional)</label>
           <input
             type="text"
-            value={data.house_bill_of_lading_number || ""}
-            onChange={(e) => handleFieldChange("house_bill_of_lading_number", e.target.value)}
+            value={data.house_bill_number || ""}
+            onChange={(e) => handleFieldChange("house_bill_number", e.target.value as string)}
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
             placeholder="Enter house bill number"
           />
-          {errors.house_bill_of_lading_number && (
-            <p className="text-red-500 text-sm mt-1">{errors.house_bill_of_lading_number}</p>
+          {errors.house_bill_number && (
+            <p className="text-red-500 text-sm mt-1">{errors.house_bill_number}</p>
           )}
         </div>
       </div>
     </div>
   );
-};
+});
 
 export default CargoFormItem;

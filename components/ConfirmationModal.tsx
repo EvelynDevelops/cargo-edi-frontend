@@ -1,5 +1,5 @@
 import React from 'react';
-import { CargoFormData } from '@/components/CargoFormItem';
+import type { CargoFormData } from '@/components/CargoFormItem';
 import CargoCard from '@/components/CargoCard';
 
 /**
@@ -42,7 +42,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
   // Calculate total number of packages across all cargo items
   const totalPackages = cargoItems.reduce(
-    (sum, item) => sum + item.number_of_packages,
+    (sum, item) => sum + item.package_count,
     0
   );
 
@@ -53,8 +53,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     
     // Additional segments for optional fields
     if (item.container_number) segments += 2;
-    if (item.master_bill_of_lading_number) segments += 2;
-    if (item.house_bill_of_lading_number) segments += 2;
+    if (item.master_bill_number) segments += 2;
+    if (item.house_bill_number) segments += 2;
     
     return total + segments;
   }, 0);
