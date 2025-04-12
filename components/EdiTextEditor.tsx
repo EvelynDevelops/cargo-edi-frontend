@@ -58,13 +58,55 @@ const EdiDecoder = forwardRef(function EdiDecoder({
   useEffect(() => {
     if (error) {
       const newErrorLines: number[] = [];
+      
+      // Check for empty line error
+      if (error.includes("Empty lines are not allowed")) {
+        // Find all empty lines
+        lines.forEach((line, index) => {
+          if (line.trim() === '') {
+            newErrorLines.push(index);
+          }
+        });
+      }
+
+      // Check for errors with line numbers
       const errorMatches = error.matchAll(/Line (\d+):/g);
       for (const match of errorMatches) {
         if (match[1]) {
           newErrorLines.push(parseInt(match[1], 10) - 1); // Convert to 0-based index
         }
       }
-      setErrorLines(newErrorLines);
+
+      // Check for specific error types
+      if (error.includes("Invalid RFF format")) {
+        // Find all RFF lines
+        lines.forEach((line, index) => {
+          if (line.startsWith('RFF+')) {
+            newErrorLines.push(index);
+          }
+        });
+      }
+
+      if (error.includes("Invalid cargo type")) {
+        // Find all PAC+++ lines
+        lines.forEach((line, index) => {
+          if (line.startsWith('PAC+++')) {
+            newErrorLines.push(index);
+          }
+        });
+      }
+
+      if (error.includes("package count")) {
+        // Find all PAC+number+1' lines
+        lines.forEach((line, index) => {
+          if (line.match(/^PAC\+\d+\+1'/)) {
+            newErrorLines.push(index);
+          }
+        });
+      }
+
+      // Remove duplicates and sort error line numbers
+      setErrorLines([...new Set(newErrorLines)].sort((a, b) => a - b));
     } else {
       setErrorLines([]);
     }
@@ -94,7 +136,7 @@ const EdiDecoder = forwardRef(function EdiDecoder({
     const newValue = e.target.value;
     setInput(newValue);
     
-    // 只有当输入不为空时，才清除错误提示
+    // Only clear error message when input is not empty
     if (newValue.trim() !== '' && error === 'Please enter EDI content before decoding') {
       if (setError) setError("");
     }
@@ -140,7 +182,6 @@ const EdiDecoder = forwardRef(function EdiDecoder({
 
   const errorLinePositions = getErrorLinePositions();
 
-  // 创建一个带有行号的文本显示
   const renderTextWithLineNumbers = () => {
     return lines.map((line, index) => {
       const isErrorLine = errorLines.includes(index);

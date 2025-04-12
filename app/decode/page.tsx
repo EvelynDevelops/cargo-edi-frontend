@@ -61,14 +61,22 @@ export default function DecodePage() {
         responseData = JSON.parse(responseText);
       } catch (e) {
         if (!res.ok) {
-          // Handle validation errors with specific format
+          // Handle empty line error
+          if (responseText.includes("Empty lines are not allowed")) {
+            throw new Error("Empty lines are not allowed between EDI segments");
+          }
+          // Handle other validation errors
           if (responseText.includes("Invalid EDI format")) {
             const errorDetails = responseText.match(/\[(.*?)\]/g);
             if (errorDetails) {
-              throw new Error(`EDI Format Error:\n${errorDetails.join('\n')}`);
+              // Remove brackets and quotes, split into individual error messages
+              const cleanErrors = errorDetails
+                .map(detail => detail.slice(1, -1))
+                .join(", ");
+              throw new Error(cleanErrors);
             }
           }
-          throw new Error(`Failed to parse EDI: ${responseText}`);
+          throw new Error(responseText);
         }
       }
       
