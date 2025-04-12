@@ -4,7 +4,7 @@ import { useState, useRef } from "react";
 import CargoFormItem, { CargoFormData, CargoFormErrors, CargoFormRef } from "@/components/CargoFormItem";
 import EdiOutputPanel from "@/components/OutputPanel";
 import ConfirmationModal from "@/components/ConfirmationModal";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 
 export default function HomePage() {
   // Initial cargo items list

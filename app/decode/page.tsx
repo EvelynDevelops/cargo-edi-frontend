@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import EdiDecoder from "@/components/EdiTextEditor";
 import { CargoFormData } from "@/components/CargoFormItem";
 import OutputPanel from "../../components/OutputPanel";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 
 // Define response types
 interface IApiResponse {

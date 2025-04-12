@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import SuccessIcon from "../public/icons/SuccessIcon";
+import SuccessIcon from "@/public/icons/SuccessIcon";
 
 type Props = {
   onCopy: () => void;

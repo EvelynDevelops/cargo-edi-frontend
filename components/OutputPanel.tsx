@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import CopyButton from "./CopyButton";
-import { Button } from "@/components/ui/button";
+import CopyButton from "@/components/ui/CopyButton";
+import { Button } from "@/components/ui/Button";
 
 type Props = {
   ediOutput: string;

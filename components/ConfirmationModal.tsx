@@ -1,7 +1,7 @@
 import React from 'react';
 import type { CargoFormData } from '@/components/CargoFormItem';
 import CargoCard from '@/components/CargoCard';
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 
 /**
  * Props for the ConfirmationModal component

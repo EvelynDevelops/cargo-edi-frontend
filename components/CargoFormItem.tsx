@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import CrossIcon from "../public/icons/CrossIcon";
+import { TextInput } from "./ui/TextInput";
 
 export type CargoType = "FCX" | "LCL" | "FCL";
 
@@ -158,6 +159,59 @@ const CargoFormItem = forwardRef<CargoFormRef, Props>(({
     return ["FCX", "LCL", "FCL"].includes(value);
   };
 
+  const validateForm = (data: CargoFormData): CargoFormErrors => {
+    const errors: CargoFormErrors = {} as CargoFormErrors;
+    
+    // Validate cargo_type
+    if (validationRules.cargo_type.required && !data.cargo_type) {
+      errors.cargo_type = validationRules.cargo_type.message || "Cargo type is required";
+    } else {
+      errors.cargo_type = "";
+    }
+    
+    // Validate package_count
+    if (validationRules.package_count.required && !data.package_count) {
+      errors.package_count = validationRules.package_count.message || "Package count is required";
+    } else {
+      errors.package_count = "";
+    }
+    
+    // Validate container_number
+    if (data.container_number && validationRules.container_number.pattern) {
+      if (!validationRules.container_number.pattern.test(data.container_number)) {
+        errors.container_number = validationRules.container_number.message || "Invalid container number";
+      } else {
+        errors.container_number = "";
+      }
+    } else {
+      errors.container_number = "";
+    }
+    
+    // Validate master_bill_number
+    if (data.master_bill_number && validationRules.master_bill_number.pattern) {
+      if (!validationRules.master_bill_number.pattern.test(data.master_bill_number)) {
+        errors.master_bill_number = validationRules.master_bill_number.message || "Invalid master bill number";
+      } else {
+        errors.master_bill_number = "";
+      }
+    } else {
+      errors.master_bill_number = "";
+    }
+    
+    // Validate house_bill_number
+    if (data.house_bill_number && validationRules.house_bill_number.pattern) {
+      if (!validationRules.house_bill_number.pattern.test(data.house_bill_number)) {
+        errors.house_bill_number = validationRules.house_bill_number.message || "Invalid house bill number";
+      } else {
+        errors.house_bill_number = "";
+      }
+    } else {
+      errors.house_bill_number = "";
+    }
+    
+    return errors;
+  };
+
   return (
     <div className="bg-white border border-gray-300 rounded-xl px-6 py-6 mb-6">
       <div className="flex items-center justify-between mb-6">
@@ -196,77 +250,63 @@ const CargoFormItem = forwardRef<CargoFormRef, Props>(({
         </div>
 
         {/* Number of Packages */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Number of Packages</label>
-          <input
-            type="number"
-            min={1}
-            className={`w-full border ${errors.package_count ? 'border-red-500' : 'border-gray-300'} rounded-md px-3 py-2 text-sm`}
-            value={data.package_count ?? ""}
-            onChange={(e) => handleFieldChange("package_count", e.target.value === "" ? "" : Number(e.target.value))}
-            onBlur={(e) => handleBlur("package_count", e.target.value === "" ? "" : Number(e.target.value))}
-            placeholder="Enter number of packages"
-            data-form-index={index}
-            data-field="package_count"
-          />
-          {errors.package_count && (
-            <p className="text-red-500 text-sm mt-1">{errors.package_count}</p>
-          )}
-        </div>
+        <TextInput
+          label="Number of Packages"
+          type="number"
+          min={1}
+          value={data.package_count ?? ""}
+          onChange={(e) => handleFieldChange("package_count", e.target.value === "" ? "" : Number(e.target.value))}
+          onBlur={(e) => handleBlur("package_count", e.target.value === "" ? "" : Number(e.target.value))}
+          placeholder="Enter number of packages"
+          error={errors.package_count}
+          data-form-index={index}
+          data-field="package_count"
+          onKeyDown={(e) => {
+            if (e.key === '.') {
+              e.preventDefault();
+            }
+          }}
+          onInput={(e) => {
+            const input = e.target as HTMLInputElement;
+            input.value = input.value.replace(/[^\d]/g, '');
+          }}
+        />
 
         {/* Container Number */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Container Number (Optional)</label>
-          <input
-            type="text"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-            value={data.container_number ?? ""}
-            onChange={(e) => handleFieldChange("container_number", e.target.value)}
-            onBlur={(e) => handleBlur("container_number", e.target.value)}
-            placeholder="Enter container number (optional)"
-            data-form-index={index}
-            data-field="container_number"
-          />
-          {errors.container_number && (
-            <p className="text-red-500 text-sm mt-1">{errors.container_number}</p>
-          )}
-        </div>
+        <TextInput
+          label="Container Number (Optional)"
+          value={data.container_number ?? ""}
+          onChange={(e) => handleFieldChange("container_number", e.target.value)}
+          onBlur={(e) => handleBlur("container_number", e.target.value)}
+          placeholder="Enter container number (optional)"
+          error={errors.container_number}
+          data-form-index={index}
+          data-field="container_number"
+        />
 
         {/* Master Bill */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Master Bill Number (Optional)</label>
-          <input
-            type="text"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-            value={data.master_bill_number ?? ""}
-            onChange={(e) => handleFieldChange("master_bill_number", e.target.value)}
-            onBlur={(e) => handleBlur("master_bill_number", e.target.value)}
-            placeholder="Enter master bill number (optional)"
-            data-form-index={index}
-            data-field="master_bill_number"
-          />
-          {errors.master_bill_number && (
-            <p className="text-red-500 text-sm mt-1">{errors.master_bill_number}</p>
-          )}
-        </div>
+        <TextInput
+          label="Master Bill Number (Optional)"
+          value={data.master_bill_number ?? ""}
+          onChange={(e) => handleFieldChange("master_bill_number", e.target.value)}
+          onBlur={(e) => handleBlur("master_bill_number", e.target.value)}
+          placeholder="Enter master bill number (optional)"
+          error={errors.master_bill_number}
+          data-form-index={index}
+          data-field="master_bill_number"
+        />
 
         {/* House Bill */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">House Bill Number (Optional)</label>
-          <input
-            type="text"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-            value={data.house_bill_number ?? ""}
-            onChange={(e) => handleFieldChange("house_bill_number", e.target.value)}
-            onBlur={(e) => handleBlur("house_bill_number", e.target.value)}
-            placeholder="Enter house bill number (optional)"
-            data-form-index={index}
-            data-field="house_bill_number"
-          />
-          {errors.house_bill_number && (
-            <p className="text-red-500 text-sm mt-1">{errors.house_bill_number}</p>
-          )}
-        </div>
+        <TextInput
+          label="House Bill Number (Optional)"
+          value={data.house_bill_number ?? ""}
+          onChange={(e) => handleFieldChange("house_bill_number", e.target.value)}
+          onBlur={(e) => handleBlur("house_bill_number", e.target.value)}
+          placeholder="Enter house bill number (optional)"
+          error={errors.house_bill_number}
+          data-form-index={index}
+          data-field="house_bill_number"
+        />
       </div>
     </div>
   );
