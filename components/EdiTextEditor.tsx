@@ -25,7 +25,7 @@ const EdiDecoder = forwardRef(function EdiDecoder({
   setError
 }: Props, ref) {
   const [input, setInput] = useState("");
-  const [errorLine, setErrorLine] = useState<number | null>(null);
+  const [errorLines, setErrorLines] = useState<number[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [lineHeight, setLineHeight] = useState(0);
   const [lines, setLines] = useState<string[]>([]);
@@ -54,33 +54,19 @@ const EdiDecoder = forwardRef(function EdiDecoder({
     setLines(input.split('\n'));
   }, [input]);
 
-  // Extract error line number from error message
+  // Extract error line numbers from error message
   useEffect(() => {
     if (error) {
-      // Check for empty line error
-      if (error.includes("Empty line is not allowed")) {
-        setIsEmptyLineError(true);
-        // Find the first empty line
-        for (let i = 0; i < lines.length; i++) {
-          if (lines[i].trim() === '') {
-            setErrorLine(i);
-            return;
-          }
-        }
-      } else {
-        setIsEmptyLineError(false);
-        // Check for line number in error message
-        const lineMatch = error.match(/Line (\d+):/);
-        if (lineMatch && lineMatch[1]) {
-          const lineNum = parseInt(lineMatch[1], 10) - 1; // Convert to 0-based index
-          setErrorLine(lineNum);
-        } else {
-          setErrorLine(null);
+      const newErrorLines: number[] = [];
+      const errorMatches = error.matchAll(/Line (\d+):/g);
+      for (const match of errorMatches) {
+        if (match[1]) {
+          newErrorLines.push(parseInt(match[1], 10) - 1); // Convert to 0-based index
         }
       }
+      setErrorLines(newErrorLines);
     } else {
-      setIsEmptyLineError(false);
-      setErrorLine(null);
+      setErrorLines([]);
     }
   }, [error, lines]);
 
@@ -91,7 +77,7 @@ const EdiDecoder = forwardRef(function EdiDecoder({
     },
     handleClear: () => {
       setInput("");
-      setErrorLine(null);
+      setErrorLines([]);
       if (setError) setError("");
     },
     getInput: () => input
@@ -105,48 +91,59 @@ const EdiDecoder = forwardRef(function EdiDecoder({
   }, [input]);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInput(e.target.value);
+    const newValue = e.target.value;
+    setInput(newValue);
+    
+    // 只有当输入不为空时，才清除错误提示
+    if (newValue.trim() !== '' && error === 'Please enter EDI content before decoding') {
+      if (setError) setError("");
+    }
+    
     if (onInputChange) onInputChange();
   };
 
-  // Calculate the position of the error line
-  const getErrorLinePosition = () => {
-    if (errorLine === null || lineHeight === 0) return null;
+  // Calculate the positions of error lines
+  const getErrorLinePositions = () => {
+    if (errorLines.length === 0 || lineHeight === 0 || !lines.length) return [];
 
-    let topPosition = 12; // Initial padding
-    let totalHeight = 0;
-    
-    // Calculate position considering all previous lines
-    for (let i = 0; i < lines.length; i++) {
-      const lineContent = lines[i];
-      const isEmptyLine = lineContent.trim() === '';
+    return errorLines.map(lineNum => {
+      if (lineNum >= lines.length) return null;
       
-      // Current line height calculation
-      const currentLineHeight = isEmptyLine 
-        ? Math.max(lineHeight, 21) // Slightly increased minimum height for empty lines
-        : lineHeight;
+      let topPosition = 12; // Initial padding
       
-      // If this is the error line, store the position and height
-      if (i === errorLine) {
-        return {
-          top: `${topPosition}px`,
-          height: `${currentLineHeight}px`
-        };
+      // Calculate position considering all previous lines
+      for (let i = 0; i < lineNum && i < lines.length; i++) {
+        const lineContent = lines[i] || '';
+        const isEmptyLine = lineContent.trim() === '';
+        
+        // Current line height calculation
+        const currentLineHeight = isEmptyLine 
+          ? Math.max(lineHeight, 21) // Slightly increased minimum height for empty lines
+          : lineHeight;
+        
+        topPosition += currentLineHeight;
       }
-      
-      // Add this line's height to the running total
-      topPosition += currentLineHeight;
-    }
 
-    return null;
+      // Calculate current line height
+      const currentLineContent = lines[lineNum] || '';
+      const isEmptyLine = currentLineContent.trim() === '';
+      const currentLineHeight = isEmptyLine 
+        ? Math.max(lineHeight, 21)
+        : lineHeight;
+
+      return {
+        top: `${topPosition}px`,
+        height: `${currentLineHeight}px`
+      };
+    }).filter(Boolean); // Remove any null values
   };
 
-  const errorLineStyle = getErrorLinePosition();
+  const errorLinePositions = getErrorLinePositions();
 
   // 创建一个带有行号的文本显示
   const renderTextWithLineNumbers = () => {
     return lines.map((line, index) => {
-      const isErrorLine = index === errorLine;
+      const isErrorLine = errorLines.includes(index);
       const isEmptyLine = line.trim() === '';
       
       return (
@@ -170,18 +167,19 @@ const EdiDecoder = forwardRef(function EdiDecoder({
           value={input}
           onChange={handleChange}
         />
-        {errorLine !== null && errorLineStyle && (
+        {errorLinePositions.map((position, index) => (
           <div 
+            key={index}
             className="absolute pointer-events-none bg-red-100 opacity-70"
             style={{
-              top: errorLineStyle.top,
+              top: position.top,
               left: '12px',
               right: '12px',
-              height: errorLineStyle.height,
+              height: position.height,
               zIndex: 10,
             }}
           />
-        )}
+        ))}
       </div>
       <ErrorPanel error={error} />
     </div>

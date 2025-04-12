@@ -2,64 +2,45 @@
 
 import React from "react";
 
-interface ErrorPanelProps {
+type Props = {
   error: string;
-  className?: string;
-}
+};
 
-const ErrorPanel: React.FC<ErrorPanelProps> = ({
-  error,
-  className = "",
-}) => {
+const ErrorPanel: React.FC<Props> = ({ error }) => {
   if (!error) return null;
 
-  // Parse error message, remove brackets and prefixes
-  const formatError = (errorMsg: string): string => {
-    // Remove EDI decoding failed: Invalid EDI format: prefix
-    const withoutPrefix = errorMsg.replace(/^EDI decoding failed: Invalid EDI format:\s*/, '');
-    
-    // If error message is in array format (handles both [' '] and [" "] formats)
-    if (withoutPrefix.startsWith('[') && withoutPrefix.endsWith(']')) {
-      // Extract the actual content inside brackets
-      const contentWithQuotes = withoutPrefix.slice(1, -1);
-      
-      // Remove both single and double quotes at beginning and end
-      let cleanContent = contentWithQuotes;
-      if ((cleanContent.startsWith("'") && cleanContent.endsWith("'")) || 
-          (cleanContent.startsWith('"') && cleanContent.endsWith('"'))) {
-        cleanContent = cleanContent.slice(1, -1);
-      }
-      
-      // Split by commas if there are multiple errors
-      // But be careful not to split inside the error message itself
-      let errors = [cleanContent]; // Default to single error
-      if (cleanContent.includes('", "') || cleanContent.includes("', '")) {
-        // This is a more complex case with multiple errors
-        // Use regex to split properly
-        const multipleErrors = cleanContent.match(/['"][^'"]*['"],\s*['"][^'"]*['"]|['"][^'"]*['"]/g);
-        if (multipleErrors) {
-          errors = multipleErrors.map(e => e.replace(/^['"]|['"]$/g, ''));
-        }
-      }
-      
-      // Process each error
-      return errors.map(err => {
-        // Remove line prefix
-        return err.replace(/^Line \d+:\s*/, '');
-      }).join('\n');
-    }
-    
-    // For single error (not in array format), just remove line prefix
-    return withoutPrefix.replace(/^Line \d+:\s*/, '');
-  };
+  // Check if it's an EDI format error
+  if (error.startsWith('EDI decoding failed: Invalid EDI format:')) {
+    // Remove prefix and brackets
+    const cleanError = error
+      .replace("EDI decoding failed: Invalid EDI format: [", "")
+      .replace(/[\[\],]/g, "")
+      .trim();
 
-  const formattedError = formatError(error);
+    // Split error messages into lines and process them
+    const errorLines = cleanError
+      .split("'")
+      .filter(Boolean)
+      .map(line => line.trim())
+      .filter(line => line.startsWith("Line")) // Keep only lines starting with "Line"
+      .map(line => line.replace(/^Line \d+: /, '')); // Remove "Line X:" prefix
 
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-md p-3">
+        {errorLines.map((line, index) => (
+          <div key={index} className="text-sm text-red-500 mb-1 last:mb-0">
+            {line}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // Display regular error message
   return (
-    <div className={`space-y-2 ${className}`}>
-      {/* Error message panel */}
-      <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-        <p className="text-sm text-red-600 whitespace-pre-line">{formattedError}</p>
+    <div className="bg-red-50 border border-red-200 rounded-md p-3">
+      <div className="text-sm text-red-500">
+        {error}
       </div>
     </div>
   );

@@ -37,6 +37,11 @@ export default function DecodePage() {
   };
 
   const handleDecode = async (input: string) => {
+    if (!input || input.trim() === '') {
+      setError('Please enter EDI content before decoding');
+      return;
+    }
+
     setLoading(true);
     setError("");
     try {
