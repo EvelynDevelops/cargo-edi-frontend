@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import EdiDecoder from "@/components/EdiTextEditor";
+import EdiTextEditor from "@/components/EdiTextEditor";
 import { CargoFormData } from "@/components/CargoFormItem";
 import OutputPanel from "../../components/OutputPanel";
 import { Button } from "@/components/ui/Button";
@@ -141,7 +141,7 @@ export default function DecodePage() {
               Clear All
             </Button>
           </div>
-          <EdiDecoder 
+          <EdiTextEditor 
             ref={decoderRef} 
             onDecode={handleDecode} 
             onInputChange={handleInputChange}

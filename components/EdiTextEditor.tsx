@@ -1,230 +1,71 @@
 "use client";
 
-import {
-  useState,
-  useEffect,
-  useRef,
-  useImperativeHandle,
-  forwardRef,
-} from "react";
+import React, { forwardRef, useImperativeHandle } from "react";
 import ErrorPanel from "./ErrorPanel";
+import EdiTextArea from "./edi/EdiTextArea";
+import { useEdiEditor } from "@/hooks/useEdiEditor";
 
-type Props = {
+// Define interfaces
+interface EdiTextEditorProps {
   onDecode: (input: string) => void;
   onInputChange?: () => void;
   loading?: boolean;
   error?: string;
   setError?: (error: string) => void;
-};
+}
 
-const EdiDecoder = forwardRef(function EdiDecoder({ 
+interface EdiTextEditorRef {
+  handleDecode: () => void;
+  handleClear: () => void;
+  getInput: () => string;
+}
+
+/**
+ * EDI Text Editor Component
+ * Used for editing and parsing EDI content
+ */
+const EdiTextEditor = forwardRef<EdiTextEditorRef, EdiTextEditorProps>(function EdiTextEditor({ 
   onDecode, 
   onInputChange,
   loading = false,
   error = "",
   setError
-}: Props, ref) {
-  const [input, setInput] = useState("");
-  const [errorLines, setErrorLines] = useState<number[]>([]);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [lineHeight, setLineHeight] = useState(0);
-  const [lines, setLines] = useState<string[]>([]);
-  const [isEmptyLineError, setIsEmptyLineError] = useState(false);
+}, ref) {
+  const {
+    input,
+    errorLines,
+    lines,
+    textareaRef,
+    handleChange,
+    handleDecode,
+    handleClear,
+    getInput
+  } = useEdiEditor({
+    onDecode,
+    onInputChange,
+    error,
+    setError
+  });
 
-  // Calculate line height and update lines
-  useEffect(() => {
-    if (textareaRef.current) {
-      // Create a temporary element to calculate line height
-      const temp = document.createElement('div');
-      temp.style.visibility = 'hidden';
-      temp.style.position = 'absolute';
-      temp.style.whiteSpace = 'pre-wrap';
-      temp.style.font = window.getComputedStyle(textareaRef.current).font;
-      temp.style.width = textareaRef.current.clientWidth + 'px';
-      temp.textContent = 'A';
-      document.body.appendChild(temp);
-      
-      const height = temp.offsetHeight;
-      document.body.removeChild(temp);
-      
-      setLineHeight(height);
-    }
-
-    // Update lines
-    setLines(input.split('\n'));
-  }, [input]);
-
-  // Extract error line numbers from error message
-  useEffect(() => {
-    if (error) {
-      const newErrorLines: number[] = [];
-      
-      // Check for empty line error
-      if (error.includes("Empty lines are not allowed")) {
-        // Find all empty lines
-        lines.forEach((line, index) => {
-          if (line.trim() === '') {
-            newErrorLines.push(index);
-          }
-        });
-      }
-
-      // Check for errors with line numbers
-      const errorMatches = error.matchAll(/Line (\d+):/g);
-      for (const match of errorMatches) {
-        if (match[1]) {
-          newErrorLines.push(parseInt(match[1], 10) - 1); // Convert to 0-based index
-        }
-      }
-
-      // Check for specific error types
-      if (error.includes("Invalid RFF format")) {
-        // Find all RFF lines
-        lines.forEach((line, index) => {
-          if (line.startsWith('RFF+')) {
-            newErrorLines.push(index);
-          }
-        });
-      }
-
-      if (error.includes("Invalid cargo type")) {
-        // Find all PAC+++ lines
-        lines.forEach((line, index) => {
-          if (line.startsWith('PAC+++')) {
-            newErrorLines.push(index);
-          }
-        });
-      }
-
-      if (error.includes("package count")) {
-        // Find all PAC+number+1' lines
-        lines.forEach((line, index) => {
-          if (line.match(/^PAC\+\d+\+1'/)) {
-            newErrorLines.push(index);
-          }
-        });
-      }
-
-      // Remove duplicates and sort error line numbers
-      setErrorLines([...new Set(newErrorLines)].sort((a, b) => a - b));
-    } else {
-      setErrorLines([]);
-    }
-  }, [error, lines]);
-
+  // Expose methods to parent component
   useImperativeHandle(ref, () => ({
-    handleDecode: () => {
-      if (setError) setError("");
-      onDecode(input);
-    },
-    handleClear: () => {
-      setInput("");
-      setErrorLines([]);
-      if (setError) setError("");
-    },
-    getInput: () => input
+    handleDecode,
+    handleClear,
+    getInput
   }));
-
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = textareaRef.current.scrollHeight + "px";
-    }
-  }, [input]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newValue = e.target.value;
-    setInput(newValue);
-    
-    // Only clear error message when input is not empty
-    if (newValue.trim() !== '' && error === 'Please enter EDI content before decoding') {
-      if (setError) setError("");
-    }
-    
-    if (onInputChange) onInputChange();
-  };
-
-  // Calculate the positions of error lines
-  const getErrorLinePositions = () => {
-    if (errorLines.length === 0 || lineHeight === 0 || !lines.length) return [];
-
-    return errorLines.map(lineNum => {
-      if (lineNum >= lines.length) return null;
-      
-      let topPosition = 12; // Initial padding
-      
-      // Calculate position considering all previous lines
-      for (let i = 0; i < lineNum && i < lines.length; i++) {
-        const lineContent = lines[i] || '';
-        const isEmptyLine = lineContent.trim() === '';
-        
-        // Current line height calculation
-        const currentLineHeight = isEmptyLine 
-          ? Math.max(lineHeight, 21) // Slightly increased minimum height for empty lines
-          : lineHeight;
-        
-        topPosition += currentLineHeight;
-      }
-
-      // Calculate current line height
-      const currentLineContent = lines[lineNum] || '';
-      const isEmptyLine = currentLineContent.trim() === '';
-      const currentLineHeight = isEmptyLine 
-        ? Math.max(lineHeight, 21)
-        : lineHeight;
-
-      return {
-        top: `${topPosition}px`,
-        height: `${currentLineHeight}px`
-      };
-    }).filter(Boolean); // Remove any null values
-  };
-
-  const errorLinePositions = getErrorLinePositions();
-
-  const renderTextWithLineNumbers = () => {
-    return lines.map((line, index) => {
-      const isErrorLine = errorLines.includes(index);
-      const isEmptyLine = line.trim() === '';
-      
-      return (
-        <div 
-          key={index} 
-          className={`font-mono text-sm ${isErrorLine ? 'bg-red-100' : ''} ${isEmptyLine ? 'min-h-[1.5em]' : ''}`}
-        >
-          {line}
-        </div>
-      );
-    });
-  };
 
   return (
     <div className="bg-transparent rounded-lg mb-1 space-y-2">
-      <div className="relative">
-        <textarea
-          ref={textareaRef}
-          className="w-full min-h-135 border border-gray-200 p-3 text-sm font-mono rounded-md resize-none overflow-auto"
-          placeholder="Paste existing EDI here to parse it"
-          value={input}
-          onChange={handleChange}
-        />
-        {errorLinePositions.map((position, index) => (
-          <div 
-            key={index}
-            className="absolute pointer-events-none bg-red-100 opacity-70"
-            style={{
-              top: position.top,
-              left: '12px',
-              right: '12px',
-              height: position.height,
-              zIndex: 10,
-            }}
-          />
-        ))}
-      </div>
+      <EdiTextArea 
+        value={input}
+        onChange={handleChange}
+        textareaRef={textareaRef}
+        errorLines={errorLines}
+        lines={lines}
+      />
       <ErrorPanel error={error} />
     </div>
   );
 });
 
-export default EdiDecoder;
+export default EdiTextEditor;

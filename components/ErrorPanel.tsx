@@ -2,45 +2,58 @@
 
 import React from "react";
 
-type Props = {
+interface ErrorPanelProps {
   error: string;
+}
+
+/**
+ * Process error message by removing quotes and line number prefixes
+ */
+const processErrorMessage = (message: string): string => {
+  // Remove quotes
+  let cleanMessage = message.replace(/['"]/g, '');
+  
+  // If it's a line number error, remove "Line X:" prefix
+  if (cleanMessage.match(/^Line \d+:/)) {
+    cleanMessage = cleanMessage.replace(/^Line \d+:\s*/, '');
+  }
+  
+  return cleanMessage;
 };
 
-const ErrorPanel: React.FC<Props> = ({ error }) => {
-  if (!error) return null;
+/**
+ * Parse EDI format error messages from the error string
+ */
+const parseEdiFormatError = (error: string): string[] => {
+  // Remove prefix and extract error messages
+  const cleanError = error
+    .replace("EDI decoding failed: Invalid EDI format:", "")
+    .trim();
 
-  // Process error message
-  const processErrorMessage = (message: string) => {
-    // Remove quotes
-    let cleanMessage = message.replace(/['"]/g, '');
-    
-    // If it's a line number error, remove "Line X:" prefix
-    if (cleanMessage.match(/^Line \d+:/)) {
-      cleanMessage = cleanMessage.replace(/^Line \d+:\s*/, '');
-    }
-    
-    return cleanMessage;
-  };
+  // Handle both array-style and single message formats
+  if (cleanError.startsWith('[') && cleanError.endsWith(']')) {
+    // Remove brackets and split by commas if multiple messages
+    return cleanError
+      .slice(1, -1)
+      .split(',')
+      .map(msg => msg.trim())
+      .map(processErrorMessage);
+  }
+  
+  return [processErrorMessage(cleanError)];
+};
+
+/**
+ * Error Panel Component
+ * Displays error messages with appropriate formatting
+ * Handles both EDI format errors and regular errors
+ */
+const ErrorPanel: React.FC<ErrorPanelProps> = ({ error }) => {
+  if (!error) return null;
 
   // Check if it's an EDI format error
   if (error.startsWith('EDI decoding failed: Invalid EDI format:')) {
-    // Remove prefix and extract error messages
-    const cleanError = error
-      .replace("EDI decoding failed: Invalid EDI format:", "")
-      .trim();
-
-    // Handle both array-style and single message formats
-    let errorMessages: string[] = [];
-    if (cleanError.startsWith('[') && cleanError.endsWith(']')) {
-      // Remove brackets and split by commas if multiple messages
-      errorMessages = cleanError
-        .slice(1, -1)
-        .split(',')
-        .map(msg => msg.trim())
-        .map(processErrorMessage);
-    } else {
-      errorMessages = [processErrorMessage(cleanError)];
-    }
+    const errorMessages = parseEdiFormatError(error);
 
     return (
       <div className="bg-red-50 border border-red-200 rounded-md p-3">

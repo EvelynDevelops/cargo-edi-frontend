@@ -10,12 +10,12 @@ import { Button } from "@/components/ui/Button";
  * @property {Function} onConfirm - Callback function to handle confirmation
  * @property {CargoFormData[]} cargoItems - Array of cargo items to display
  */
-type ConfirmationModalProps = {
+interface ConfirmationModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (updatedItems: CargoFormData[]) => void;
   cargoItems: CargoFormData[];
-};
+}
 
 /**
  * ConfirmationModal component displays a modal for reviewing cargo information
