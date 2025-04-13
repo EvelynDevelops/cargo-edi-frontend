@@ -7,6 +7,7 @@ interface CargoTypeSelectProps {
   onBlur: (value: string) => void;
   error?: string;
   index: number;
+  "data-testid"?: string;
 }
 
 const CargoTypeSelect: React.FC<CargoTypeSelectProps> = ({
@@ -14,7 +15,8 @@ const CargoTypeSelect: React.FC<CargoTypeSelectProps> = ({
   onChange,
   onBlur,
   error,
-  index
+  index,
+  "data-testid": dataTestId
 }) => {
   const handleChange = (value: string) => {
     if (value === "") {
@@ -34,6 +36,7 @@ const CargoTypeSelect: React.FC<CargoTypeSelectProps> = ({
         onBlur={(e) => onBlur(e.target.value)}
         data-form-index={index}
         data-field="cargoType"
+        data-testid={dataTestId}
       >
         <option value="" disabled className="text-gray-500">Select cargo type</option>
         <option value="FCX" className="text-gray-900">FCX</option>

@@ -52,6 +52,7 @@ const CargoFormItem = forwardRef<CargoFormRef, Props>(({
           onBlur={(value) => handleBlur("cargoType", value)}
           error={errors.cargoType}
           index={index}
+          data-testid={`cargoType-${index}`}
         />
 
         {/* Number of Packages */}
@@ -61,6 +62,7 @@ const CargoFormItem = forwardRef<CargoFormRef, Props>(({
           onBlur={(value) => handleBlur("packageCount", value)}
           error={errors.packageCount}
           index={index}
+          data-testid={`packageCount-${index}`}
         />
 
         {/* Container Number */}
@@ -73,6 +75,7 @@ const CargoFormItem = forwardRef<CargoFormRef, Props>(({
           error={errors.containerNumber}
           data-form-index={index}
           data-field="containerNumber"
+          data-testid={`containerNumber-${index}`}
         />
 
         {/* Master Bill */}
@@ -85,6 +88,7 @@ const CargoFormItem = forwardRef<CargoFormRef, Props>(({
           error={errors.masterBillNumber}
           data-form-index={index}
           data-field="masterBillNumber"
+          data-testid={`masterBillNumber-${index}`}
         />
 
         {/* House Bill */}
@@ -97,10 +101,13 @@ const CargoFormItem = forwardRef<CargoFormRef, Props>(({
           error={errors.houseBillNumber}
           data-form-index={index}
           data-field="houseBillNumber"
+          data-testid={`houseBillNumber-${index}`}
         />
       </div>
     </div>
   );
 });
+
+CargoFormItem.displayName = "CargoFormItem";
 
 export default CargoFormItem;

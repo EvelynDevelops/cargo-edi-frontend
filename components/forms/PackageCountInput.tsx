@@ -7,6 +7,7 @@ interface PackageCountInputProps {
   onBlur: (value: string) => void;
   error?: string;
   index: number;
+  "data-testid"?: string;
 }
 
 const PackageCountInput: React.FC<PackageCountInputProps> = ({
@@ -14,7 +15,8 @@ const PackageCountInput: React.FC<PackageCountInputProps> = ({
   onChange,
   onBlur,
   error,
-  index
+  index,
+  "data-testid": dataTestId
 }) => {
   return (
     <TextInput
@@ -28,6 +30,7 @@ const PackageCountInput: React.FC<PackageCountInputProps> = ({
       error={error}
       data-form-index={index}
       data-field="packageCount"
+      data-testid={dataTestId}
       onKeyDown={(e) => {
         if (e.key === '.') {
           e.preventDefault();

@@ -1,152 +1,93 @@
 import React from 'react';
 import { useForm } from '@/hooks/useForm';
+import { CargoFormData } from '@/types/cargo';
 import { validateForm } from '@/utils/cargoValidation';
-import { CargoFormData, CargoValidationErrors } from '@/types/cargo';
 
-interface Props {
-  initialValues: CargoFormData;
-  onSubmit: (values: CargoFormData) => Promise<void>;
+interface CargoFormProps {
+  initialData: CargoFormData;
+  onSubmit: (data: CargoFormData) => Promise<void>;
 }
 
 /**
  * Example component using the useForm hook
  */
-export function CargoForm({ initialValues, onSubmit }: Props) {
+export default function CargoForm({ initialData, onSubmit }: CargoFormProps) {
   const {
     values,
     errors,
-    touched,
     isSubmitting,
     handleChange,
     handleBlur,
     handleSubmit
   } = useForm<CargoFormData>({
-    initialValues,
-    onSubmit,
-    validate: (values: CargoFormData): CargoValidationErrors => validateForm(values)
+    initialValues: initialData,
+    validate: validateForm,
+    onSubmit
   });
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        handleSubmit();
-      }}
-      className="space-y-4"
-    >
+    <div className="space-y-4">
+      {/* Cargo Type */}
       <div>
         <label className="block text-sm font-medium text-gray-700">
           Cargo Type
         </label>
         <select
           value={values.cargoType || ''}
-          onChange={(e) => handleChange('cargoType', e.target.value || undefined)}
+          onChange={(e) => handleChange('cargoType', e.target.value)}
           onBlur={() => handleBlur('cargoType')}
-          className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-            touched.cargoType && errors.cargoType ? 'border-red-500' : ''
-          }`}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
         >
-          <option value="">Select cargo type</option>
+          <option value="">Select type</option>
           <option value="FCL">FCL</option>
           <option value="LCL">LCL</option>
-          <option value="FCX">FCX</option>
         </select>
-        {touched.cargoType && errors.cargoType && (
+        {errors.cargoType && (
           <p className="mt-1 text-sm text-red-600">{errors.cargoType}</p>
         )}
       </div>
 
+      {/* Package Count */}
       <div>
         <label className="block text-sm font-medium text-gray-700">
           Package Count
         </label>
         <input
           type="number"
-          value={values.packageCount}
+          value={values.packageCount || ''}
           onChange={(e) => handleChange('packageCount', parseInt(e.target.value))}
           onBlur={() => handleBlur('packageCount')}
-          className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-            touched.packageCount && errors.packageCount ? 'border-red-500' : ''
-          }`}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
         />
-        {touched.packageCount && errors.packageCount && (
+        {errors.packageCount && (
           <p className="mt-1 text-sm text-red-600">{errors.packageCount}</p>
         )}
       </div>
 
-      {values.cargoType === 'FCL' && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Container Number
-          </label>
-          <input
-            type="text"
-            value={values.containerNumber}
-            onChange={(e) => handleChange('containerNumber', e.target.value)}
-            onBlur={() => handleBlur('containerNumber')}
-            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-              touched.containerNumber && errors.containerNumber
-                ? 'border-red-500'
-                : ''
-            }`}
-          />
-          {touched.containerNumber && errors.containerNumber && (
-            <p className="mt-1 text-sm text-red-600">{errors.containerNumber}</p>
-          )}
-        </div>
-      )}
-
+      {/* Container Number */}
       <div>
         <label className="block text-sm font-medium text-gray-700">
-          Master Bill Number
+          Container Number
         </label>
         <input
           type="text"
-          value={values.masterBillNumber}
-          onChange={(e) => handleChange('masterBillNumber', e.target.value)}
-          onBlur={() => handleBlur('masterBillNumber')}
-          className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-            touched.masterBillNumber && errors.masterBillNumber
-              ? 'border-red-500'
-              : ''
-          }`}
+          value={values.containerNumber}
+          onChange={(e) => handleChange('containerNumber', e.target.value)}
+          onBlur={() => handleBlur('containerNumber')}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
         />
-        {touched.masterBillNumber && errors.masterBillNumber && (
-          <p className="mt-1 text-sm text-red-600">{errors.masterBillNumber}</p>
+        {errors.containerNumber && (
+          <p className="mt-1 text-sm text-red-600">{errors.containerNumber}</p>
         )}
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          House Bill Number
-        </label>
-        <input
-          type="text"
-          value={values.houseBillNumber}
-          onChange={(e) => handleChange('houseBillNumber', e.target.value)}
-          onBlur={() => handleBlur('houseBillNumber')}
-          className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-            touched.houseBillNumber && errors.houseBillNumber
-              ? 'border-red-500'
-              : ''
-          }`}
-        />
-        {touched.houseBillNumber && errors.houseBillNumber && (
-          <p className="mt-1 text-sm text-red-600">{errors.houseBillNumber}</p>
-        )}
-      </div>
-
-      <div className="flex justify-end">
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
-            isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
-        >
-          {isSubmitting ? 'Submitting...' : 'Submit'}
-        </button>
-      </div>
-    </form>
+      <button
+        onClick={handleSubmit}
+        disabled={isSubmitting}
+        className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+      >
+        {isSubmitting ? 'Submitting...' : 'Submit'}
+      </button>
+    </div>
   );
 } 
