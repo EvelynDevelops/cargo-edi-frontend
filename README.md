@@ -17,11 +17,6 @@ A web application for generating and decoding EDI (Electronic Data Interchange) 
    cp .env.sample .env
    ```
    The `.env.sample` file contains example configurations:
-   ```
-   # Choose one of these API URLs based on your needs:
-   NEXT_PUBLIC_API_URL=http://127.0.0.1:8000        # For local development
-   # NEXT_PUBLIC_API_URL=https://cargo-edi-backend.onrender.com  # For production
-   ```
 
 3. Run the development server:
    ```bash
@@ -41,12 +36,24 @@ A web application for generating and decoding EDI (Electronic Data Interchange) 
 ```
 cargo-edi-frontend/
 ├── app/             # Next.js pages and routing
-├── components/      # React components
+│   ├── forms/      # Form-related components
+│   ├── shared/     # Shared UI components
+│   └── edi/        # EDI-specific components
 ├── hooks/           # Custom React hooks
 ├── services/        # API services
 ├── types/           # TypeScript type definitions
 └── utils/          # Utility functions
 ```
+
+## Key Dependencies
+
+- Next.js 14 - React framework
+- TypeScript - Type safety
+- Tailwind CSS - Styling
+- React Hook Form - Form handling
+- Zod - Schema validation
+- Jest & React Testing Library - Testing
+
 
 ## Features
 
@@ -56,14 +63,18 @@ cargo-edi-frontend/
 - Copy EDI content to clipboard
 - Real-time validation
 - Support for multiple cargo items
+- Responsive design for mobile and desktop
 
-## Key Dependencies
 
-- Next.js 14 - React framework
-- TypeScript - Type safety
-- Tailwind CSS - Styling
-- React Hook Form - Form handling
-- Zod - Schema validation
+## Development
+
+### Running Tests
+```bash
+npm test
+# or
+pnpm test
+```
+
 
 ## Production Build
 
@@ -77,6 +88,8 @@ npm start
 
 ### Testing
 - Add more unit tests for components and util functions
+- Add integration tests for form submissions
+- Add end-to-end tests for critical user flows
 
 ### Features
 - Add support for more EDI message types
@@ -85,10 +98,6 @@ npm start
 ### UI/UX
 - Add loading indicators for API calls
 - Implement better error handling UI
-
-### Performance
-- Add caching for API responses
-- Implement lazy loading for non-critical components
 
 ### Code Quality
 - Extract common form logic into reusable hooks
