@@ -5,6 +5,8 @@ import CargoFormItem, { CargoFormData, CargoFormErrors, CargoFormRef } from "@/c
 import EdiOutputPanel from "@/components/OutputPanel";
 import ConfirmationModal from "@/components/ConfirmationModal";
 import { Button } from "@/components/ui/Button";
+import { prepareRequestData, processResponseData } from "@/utils/caseConverter";
+import { saveAs } from 'file-saver';
 
 export default function HomePage() {
   // Initial cargo items list
@@ -28,13 +30,8 @@ export default function HomePage() {
 
   // Download EDI result as .edi file
   const handleDownload = () => {
-    const blob = new Blob([ediOutput], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "cargo_message.edi";
-    a.click();
-    URL.revokeObjectURL(url);
+    const blob = new Blob([ediOutput], { type: "text/plain;charset=utf-8" });
+    saveAs(blob, "cargo_message.edi");
   };
 
   // Copy EDI output to clipboard
@@ -184,17 +181,16 @@ export default function HomePage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ cargoItems: cargoItems }),
+        body: JSON.stringify(prepareRequestData({ cargoItems })),
       });
 
       if (!response.ok) {
-        //161 and 165
         const errorData = await response.json();
         throw new Error(errorData.detail?.message || errorData.message || "Failed to generate EDI");
       }
 
       const data = await response.json();
-      setEdiOutput(data.edi);
+      setEdiOutput(processResponseData(data).edi);
     } catch (err: any) {
       setError(err.message || "Unknown error");
     } finally {

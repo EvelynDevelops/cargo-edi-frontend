@@ -5,6 +5,7 @@ import EdiTextEditor from "@/components/EdiTextEditor";
 import { CargoFormData } from "@/components/CargoFormItem";
 import OutputPanel from "../../components/OutputPanel";
 import { Button } from "@/components/ui/Button";
+import { saveAs } from 'file-saver';
 
 // Define response types
 interface IApiResponse {
@@ -26,15 +27,9 @@ export default function DecodePage() {
 
   const handleDownloadJson = () => {
     const blob = new Blob([JSON.stringify(decoded, null, 2)], {
-      type: "application/json",
+      type: "application/json;charset=utf-8"
     });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `decoded_edi_${Date.now()}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    saveAs(blob, `decoded_edi_${Date.now()}.json`);
   };
 
   const handleDecode = async (input: string) => {
