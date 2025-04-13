@@ -1,4 +1,4 @@
-import { CargoFormData } from "@/components/CargoFormItem";
+import { CargoFormData } from "@/types/cargo";
 
 /**
  * API response interface for EDI operations

@@ -1,4 +1,4 @@
-import { CargoFormData } from "@/components/CargoFormItem";
+import { CargoFormData } from "@/types/cargo";
 import { prepareRequestData, processResponseData } from "@/utils/caseConverter";
 
 export async function generateEdi(cargoItems: CargoFormData[]) {
