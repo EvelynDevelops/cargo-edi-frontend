@@ -6,6 +6,7 @@ import EdiOutputPanel from "@/components/OutputPanel";
 import ConfirmationModal from "@/components/ConfirmationModal";
 import { Button } from "@/components/ui/Button";
 import { prepareRequestData, processResponseData } from "@/utils/caseConverter";
+import { validateForm } from "@/utils/cargoValidation";
 import { saveAs } from 'file-saver';
 import { useClipboard } from "@/hooks/useClipboard";
 import { useFileDownload } from "@/hooks/useFileDownload";
@@ -94,55 +95,28 @@ export default function HomePage() {
     let firstErrorField: { index: number; field: keyof CargoFormData } | null = null;
 
     cargoItems.forEach((item, index) => {
-      const errors = {
-        cargoType: !item.cargoType ? "Cargo type is required" : "",
-        packageCount: !item.packageCount ? "Package count is required" : "",
-        containerNumber: "",
-        masterBillNumber: "",
-        houseBillNumber: "",
+      const validationErrors = validateForm(item);
+      const errors: CargoFormErrors = {
+        cargoType: validationErrors.cargoType || "",
+        packageCount: validationErrors.packageCount || "",
+        containerNumber: validationErrors.containerNumber || "",
+        masterBillNumber: validationErrors.masterBillNumber || "",
+        houseBillNumber: validationErrors.houseBillNumber || ""
       };
       
-      // Track first error field
-      if (!firstErrorField) {
-        for (const [field, error] of Object.entries(errors)) {
-          if (error) {
-            firstErrorField = { index, field: field as keyof CargoFormData };
-            break;
+      if (Object.values(errors).some(error => error !== "")) {
+        hasErrors = true;
+        newErrors[index] = errors;
+
+        // Track first error field if not already set
+        if (!firstErrorField) {
+          for (const [field, error] of Object.entries(errors)) {
+            if (error) {
+              firstErrorField = { index, field: field as keyof CargoFormData };
+              break;
+            }
           }
         }
-      }
-      
-      // Check optional fields format
-      if (item.containerNumber && !isAlphaNumeric(item.containerNumber)) {
-        errors.containerNumber = "Container number can only contain letters and numbers";
-        hasErrors = true;
-        if (!firstErrorField) {
-          firstErrorField = { index, field: 'containerNumber' };
-        }
-      }
-      
-      if (item.masterBillNumber && !isAlphaNumeric(item.masterBillNumber)) {
-        errors.masterBillNumber = "Master bill number can only contain letters and numbers";
-        hasErrors = true;
-        if (!firstErrorField) {
-          firstErrorField = { index, field: 'masterBillNumber' };
-        }
-      }
-      
-      if (item.houseBillNumber && !isAlphaNumeric(item.houseBillNumber)) {
-        errors.houseBillNumber = "House bill number can only contain letters and numbers";
-        hasErrors = true;
-        if (!firstErrorField) {
-          firstErrorField = { index, field: 'houseBillNumber' };
-        }
-      }
-
-      if (errors.cargoType || errors.packageCount) {
-        hasErrors = true;
-      }
-
-      if (Object.values(errors).some(error => error !== "")) {
-        newErrors[index] = errors;
       }
     });
 

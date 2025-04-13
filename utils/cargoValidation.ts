@@ -9,7 +9,7 @@ interface ValidationRules {
   [key: string]: ValidationRule[];
 }
 
-// 定义验证规则
+// Validation rules
 const validationRules: ValidationRules = {
   cargoType: [
     {
@@ -18,7 +18,7 @@ const validationRules: ValidationRules = {
     },
     {
       validate: (value) => isValidCargoType(value),
-      message: "Invalid cargo type"
+      message: "Please select a valid cargo type"
     }
   ],
   packageCount: [
@@ -27,31 +27,31 @@ const validationRules: ValidationRules = {
       message: "Number of packages is required"
     },
     {
-      validate: (value) => !isNaN(Number(value)) && Number(value) > 0,
-      message: "Number of packages must be a positive number"
+      validate: (value) => !isNaN(Number(value)) && Number.isInteger(Number(value)) && Number(value) >= 1,
+      message: "Number of packages must be a positive integer"
     }
   ],
   containerNumber: [
     {
-      validate: (value) => value === undefined || value === "" || /^[A-Z0-9]{7,11}$/.test(value),
-      message: "Container number must be 7-11 characters long and contain only uppercase letters and numbers"
+      validate: (value) => value === "" || /^[A-Za-z0-9]+$/.test(value),
+      message: "Container number can only contain letters and numbers"
     }
   ],
   masterBillNumber: [
     {
-      validate: (value) => value === undefined || value === "" || /^[A-Z0-9]{5,20}$/.test(value),
-      message: "Master bill number must be 5-20 characters long and contain only uppercase letters and numbers"
+      validate: (value) => value === "" || /^[A-Za-z0-9]+$/.test(value),
+      message: "Master bill number can only contain letters and numbers"
     }
   ],
   houseBillNumber: [
     {
-      validate: (value) => value === undefined || value === "" || /^[A-Z0-9]{5,20}$/.test(value),
-      message: "House bill number must be 5-20 characters long and contain only uppercase letters and numbers"
+      validate: (value) => value === "" || /^[A-Za-z0-9]+$/.test(value),
+      message: "House bill number can only contain letters and numbers"
     }
   ]
 };
 
-// 验证单个字段
+// Validate a single field
 export const validateField = (field: keyof CargoFormData, value: any, data: CargoFormData): string => {
   const rules = validationRules[field];
   if (!rules) return "";
@@ -65,7 +65,7 @@ export const validateField = (field: keyof CargoFormData, value: any, data: Carg
   return "";
 };
 
-// 验证整个表单
+// Validate the entire form
 export const validateForm = (data: CargoFormData): { [key: string]: string } => {
   const errors: { [key: string]: string } = {};
 
