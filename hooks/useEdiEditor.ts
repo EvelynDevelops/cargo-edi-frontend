@@ -60,56 +60,81 @@ export const useEdiEditor = ({
   // Extract error line numbers from error message
   useEffect(() => {
     if (error) {
-      const newErrorLines: number[] = [];
+      const newErrorLines = new Set<number>();
       
-      // Check for empty line errors
-      if (error.includes("Empty lines are not allowed")) {
-        // Find all empty lines
+      // 1. Check for line number errors (multiple formats)
+      const linePatterns = [
+        /Line (\d+):/g,
+        /line (\d+)/gi,
+        /at line (\d+)/gi,
+        /in line (\d+)/gi
+      ];
+
+      linePatterns.forEach(pattern => {
+        const matches = error.matchAll(pattern);
+        for (const match of matches) {
+          if (match[1]) {
+            newErrorLines.add(parseInt(match[1], 10) - 1);
+          }
+        }
+      });
+
+      // 2. Check for specific segment errors
+      const segmentErrors = [
+        { error: "Invalid RFF format", segment: "RFF+" },
+        { error: "Invalid cargo type", segment: "PAC+++" },
+        { error: "package count", segment: "PAC+" },
+        { error: "Invalid MEA segment", segment: "MEA+" },
+        { error: "Invalid PCI segment", segment: "PCI+" },
+        { error: "Invalid GID segment", segment: "GID+" },
+        { error: "Invalid FTX segment", segment: "FTX+" }
+      ];
+
+      segmentErrors.forEach(({ error: errorType, segment }) => {
+        if (error.toLowerCase().includes(errorType.toLowerCase())) {
+          lines.forEach((line, index) => {
+            if (line.startsWith(segment)) {
+              newErrorLines.add(index);
+            }
+          });
+        }
+      });
+
+      // 3. Check for empty line errors
+      if (error.toLowerCase().includes("empty line")) {
         lines.forEach((line, index) => {
           if (line.trim() === '') {
-            newErrorLines.push(index);
+            newErrorLines.add(index);
           }
         });
       }
 
-      // Check for errors with line numbers
-      const errorMatches = error.matchAll(/Line (\d+):/g);
-      for (const match of errorMatches) {
-        if (match[1]) {
-          newErrorLines.push(parseInt(match[1], 10) - 1); // Convert to 0-based index
+      // 4. Check for format errors
+      if (error.toLowerCase().includes("format")) {
+        const lastLineWithContent = lines
+          .map((line, index) => ({ line, index }))
+          .filter(({ line }) => line.trim() !== '')
+          .pop();
+
+        if (lastLineWithContent) {
+          newErrorLines.add(lastLineWithContent.index);
         }
       }
 
-      // Check for specific error types
-      if (error.includes("Invalid RFF format")) {
-        // Find all RFF lines
-        lines.forEach((line, index) => {
-          if (line.startsWith('RFF+')) {
-            newErrorLines.push(index);
-          }
-        });
+      // 5. If no error lines found but there is an error message
+      if (newErrorLines.size === 0 && lines.length > 0) {
+        const lastNonEmptyIndex = lines
+          .map((line, index) => ({ line, index }))
+          .filter(({ line }) => line.trim() !== '')
+          .pop();
+
+        if (lastNonEmptyIndex) {
+          newErrorLines.add(lastNonEmptyIndex.index);
+        }
       }
 
-      if (error.includes("Invalid cargo type")) {
-        // Find all PAC+++ lines
-        lines.forEach((line, index) => {
-          if (line.startsWith('PAC+++')) {
-            newErrorLines.push(index);
-          }
-        });
-      }
-
-      if (error.includes("package count")) {
-        // Find all PAC+number+1' lines
-        lines.forEach((line, index) => {
-          if (line.match(/^PAC\+\d+\+1'/)) {
-            newErrorLines.push(index);
-          }
-        });
-      }
-
-      // Remove duplicates and sort error line numbers
-      setErrorLines([...new Set(newErrorLines)].sort((a, b) => a - b));
+      // Convert to array and sort
+      setErrorLines(Array.from(newErrorLines).sort((a, b) => a - b));
     } else {
       setErrorLines([]);
     }

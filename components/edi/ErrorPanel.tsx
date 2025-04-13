@@ -7,71 +7,112 @@ interface IErrorPanelProps {
 }
 
 /**
- * Process error message by removing quotes and line number prefixes
+ * Process error message by removing redundant prefixes and formatting
  */
 const processErrorMessage = (message: string): string => {
   // Remove quotes
   let cleanMessage = message.replace(/['"]/g, '');
   
-  // If it's a line number error, remove "Line X:" prefix
-  if (cleanMessage.match(/^Line \d+:/)) {
-    cleanMessage = cleanMessage.replace(/^Line \d+:\s*/, '');
+  // Process line number errors
+  const lineNumberMatch = cleanMessage.match(/^Line (\d+):/i);
+  if (lineNumberMatch) {
+    const lineNum = lineNumberMatch[1];
+    const errorContent = cleanMessage.substring(cleanMessage.indexOf(':') + 1).trim();
+    cleanMessage = `Line ${lineNum}: ${errorContent}`;
   }
+  
+  // Remove common error prefixes
+  const prefixesToRemove = [
+    'EDI decoding failed:',
+    'Invalid EDI format:',
+    'Validation error:',
+    'Parse error:'
+  ];
+  
+  prefixesToRemove.forEach(prefix => {
+    cleanMessage = cleanMessage.replace(new RegExp(prefix, 'gi'), '').trim();
+  });
+  
+  // Format specific error messages
+  const errorMappings: { [key: string]: string } = {
+    'Empty lines are not allowed': 'Empty lines are not allowed',
+    'Invalid RFF format': 'Invalid RFF format',
+    'Invalid cargo type': 'Invalid cargo type',
+    'Invalid package count': 'Invalid package count',
+    'Invalid MEA segment': 'Invalid MEA segment',
+    'Invalid PCI segment': 'Invalid PCI segment',
+    'Invalid GID segment': 'Invalid GID segment',
+    'Invalid FTX segment': 'Invalid FTX segment'
+  };
+
+  Object.entries(errorMappings).forEach(([key, value]) => {
+    cleanMessage = cleanMessage.replace(new RegExp(key, 'gi'), value);
+  });
   
   return cleanMessage;
 };
 
 /**
- * Parse EDI format error messages from the error string
+ * Parse EDI format error messages
  */
 const parseEdiFormatError = (error: string): string[] => {
-  // Remove prefix and extract error messages
-  const cleanError = error
-    .replace("EDI decoding failed: Invalid EDI format:", "")
+  // Remove all error prefixes
+  let cleanError = error
+    .replace(/EDI decoding failed:\s*/g, '')
+    .replace(/Invalid EDI format:\s*/g, '')
+    .replace(/Validation error:\s*/g, '')
     .trim();
 
-  // Handle both array-style and single message formats
+  // Handle array-style errors
   if (cleanError.startsWith('[') && cleanError.endsWith(']')) {
-    // Remove brackets and split by commas if multiple messages
     return cleanError
       .slice(1, -1)
       .split(',')
       .map(msg => msg.trim())
-      .map(processErrorMessage);
+      .map(processErrorMessage)
+      .filter(Boolean);
   }
   
+  // Handle semicolon-separated errors
+  if (cleanError.includes(';')) {
+    return cleanError
+      .split(';')
+      .map(msg => msg.trim())
+      .map(processErrorMessage)
+      .filter(Boolean);
+  }
+  
+  // Handle newline-separated errors
+  if (cleanError.includes('\n')) {
+    return cleanError
+      .split('\n')
+      .map(msg => msg.trim())
+      .map(processErrorMessage)
+      .filter(Boolean);
+  }
+  
+  // Handle single error message
   return [processErrorMessage(cleanError)];
 };
 
 /**
  * Error Panel Component
- * Displays error messages with appropriate formatting
- * Handles both EDI format errors and regular errors
  */
 const ErrorPanel: React.FC<IErrorPanelProps> = ({ error }) => {
   if (!error) return null;
 
-  // Check if it's an EDI format error
-  if (error.startsWith('EDI decoding failed: Invalid EDI format:')) {
-    const errorMessages = parseEdiFormatError(error);
+  const errorMessages = parseEdiFormatError(error);
 
-    return (
-      <div className="bg-red-50 border border-red-200 rounded-md p-3">
-        {errorMessages.map((message, index) => (
-          <div key={index} className="text-sm text-red-500 mb-1 last:mb-0">
-            {message}
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  // Display regular error message
   return (
     <div className="bg-red-50 border border-red-200 rounded-md p-3">
-      <div className="text-sm text-red-500">
-        {processErrorMessage(error)}
-      </div>
+      {errorMessages.map((message, index) => (
+        <div 
+          key={index} 
+          className="text-sm text-red-500 mb-1 last:mb-0 font-mono"
+        >
+          {message}
+        </div>
+      ))}
     </div>
   );
 };
