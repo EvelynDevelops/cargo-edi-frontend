@@ -31,8 +31,7 @@ export default function DecoderLayout({
   children
 }: DecoderLayoutProps) {
   return (
-    <main>
-      <main className="pt-16"></main>
+    <main className="pt-16">
       <h1 className="text-2xl font-bold mb-6">Decode Existing EDI</h1>
       <div className="grid md:grid-cols-2 gap-12 items-start">
         {/* Left: Decoder area */}
@@ -64,11 +63,6 @@ export default function DecoderLayout({
 
         {/* Right: Output Panel */}
         <div className="space-y-4">
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-3">
-              <p className="text-sm text-red-600">{error}</p>
-            </div>
-          )}
           <OutputPanel
             ediOutput={decoded.length > 0 ? JSON.stringify(decoded, null, 2) : ""}
             onDownload={onDownload}
