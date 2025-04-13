@@ -23,8 +23,12 @@ const PackageCountInput: React.FC<IPackageCountInputProps> = ({
       label="Number of Packages"
       type="number"
       min={1}
+      max={5000}
       value={value ?? ""}
-      onChange={(e) => onChange(e.target.value === "" ? 0 : Number(e.target.value))}
+      onChange={(e) => {
+        const val = e.target.value;
+        onChange(val === "" ? undefined : Number(val));
+      }}
       onBlur={(e) => onBlur(e.target.value)}
       placeholder="Enter number of packages"
       error={error}

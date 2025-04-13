@@ -29,6 +29,10 @@ const IValidationRules: IValidationRules = {
     {
       validate: (value) => !isNaN(Number(value)) && Number.isInteger(Number(value)) && Number(value) >= 1,
       message: "Number of packages must be a positive integer"
+    },
+    {
+      validate: (value) => !isNaN(Number(value)) && Number(value) <= 5000,
+      message: "Number of packages cannot exceed 5000"
     }
   ],
   containerNumber: [
