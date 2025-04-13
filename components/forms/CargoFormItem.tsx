@@ -1,11 +1,11 @@
 "use client";
 
 import React, { forwardRef, useImperativeHandle } from "react";
-import { TextInput } from "./ui/TextInput";
+import { TextInput } from "../shared/TextInput";
 import { useCargoForm } from "@/hooks/useCargoForm";
-import CargoFormHeader from "./forms/CargoFormHeader";
-import CargoTypeSelect from "./forms/CargoTypeSelect";
-import PackageCountInput from "./forms/PackageCountInput";
+import CargoFormHeader from "./CargoFormHeader";
+import CargoTypeSelect from "@/components/forms/CargoTypeSelect";
+import PackageCountInput from "@/components/forms/PackageCountInput";   
 import { CargoFormData, CargoType, CargoValidationErrors } from "@/types/cargo";
 
 interface Props {

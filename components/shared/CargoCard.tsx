@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { CargoFormData } from "@/components/CargoFormItem";
+import { CargoFormData } from "@/types/cargo";
+
 
 /**
  * Props for the CargoCard component

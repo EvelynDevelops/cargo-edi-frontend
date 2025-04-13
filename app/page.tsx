@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import CargoFormItem from "@/components/CargoFormItem";
-import ConfirmationModal from "@/components/ConfirmationModal";
+import CargoFormItem from "@/components/forms/CargoFormItem";
+import ConfirmationModal from "@/components/modals/ConfirmationModal";
 import { generateEdi } from "@/services/edi";
 import { useCargoFormList } from "@/hooks/useCargoFormList";
 import { useClipboard } from "@/hooks/useClipboard";
 import { useFileDownload } from "@/hooks/useFileDownload";
-import HomeLayout from "@/components/home/HomeLayout";
+import HomeLayout from "@/components/layouts/HomeLayout";
 
 export default function HomePage() {
   const {

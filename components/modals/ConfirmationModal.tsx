@@ -1,7 +1,7 @@
 import React from 'react';
-import type { CargoFormData } from '@/components/CargoFormItem';
-import CargoCard from '@/components/CargoCard';
-import { Button } from "@/components/ui/Button";
+import type { CargoFormData } from '@/types/cargo';
+import CargoCard from '@/components/shared/CargoCard';
+import { Button } from "@/components/shared/Button";
 
 /**
  * @property {boolean} isOpen - Whether the modal is open

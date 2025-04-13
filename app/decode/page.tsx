@@ -1,8 +1,8 @@
 "use client";
 
 import { useRef } from "react";
-import EdiTextEditor from "@/components/EdiTextEditor";
-import DecoderLayout from "@/components/decoder/DecoderLayout";
+import EdiTextEditor from "@/components/edi/EdiTextEditor";
+import DecoderLayout from "@/components/layouts/DecoderLayout";
 import { useEdiDecoder } from "@/hooks/useEdiDecoder";
 import { useClipboard } from "@/hooks/useClipboard";
 import { useFileDownload } from "@/hooks/useFileDownload";

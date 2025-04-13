@@ -1,5 +1,5 @@
 import React from "react";
-import { TextInput } from "@/components/ui/TextInput";
+import { TextInput } from "@/components/shared/TextInput";
 
 interface PackageCountInputProps {
   value?: number;

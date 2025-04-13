@@ -1,5 +1,5 @@
 import React from "react";
-import CrossIcon from "../../public/icons/CrossIcon";
+import CrossIcon from "@/public/icons/CrossIcon";
 
 interface CargoFormHeaderProps {
   index: number;

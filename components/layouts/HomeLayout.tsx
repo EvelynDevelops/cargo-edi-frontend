@@ -1,8 +1,8 @@
 "use client";
 
-import { CargoFormData } from "@/components/CargoFormItem";
-import { Button } from "@/components/ui/Button";
-import EdiOutputPanel from "@/components/OutputPanel";
+import { CargoFormData } from "@/types/cargo";
+import { Button } from "@/components/shared/Button";
+import EdiOutputPanel from "@/components/shared/OutputPanel";
 
 interface HomeLayoutProps {
   cargoItems: CargoFormData[];

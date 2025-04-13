@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import CopyButton from "@/components/ui/CopyButton";
-import { Button } from "@/components/ui/Button";
+import CopyButton from "@/components/shared/CopyButton";
+import { Button } from "@/components/shared/Button";
 
 /**
  * Props for the OutputPanel component

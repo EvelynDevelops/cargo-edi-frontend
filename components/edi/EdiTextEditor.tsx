@@ -2,7 +2,7 @@
 
 import React, { forwardRef, useImperativeHandle } from "react";
 import ErrorPanel from "./ErrorPanel";
-import EdiTextArea from "./edi/EdiTextArea";
+import EdiTextArea from "./EdiTextArea";
 import { useEdiEditor } from "@/hooks/useEdiEditor";
 
 // Define interfaces

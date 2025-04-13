@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
-import { CargoFormData, CargoFormErrors, CargoFormRef } from "@/components/CargoFormItem";
+import { CargoFormData, CargoValidationErrors } from "@/types/cargo"; 
 import { validateForm } from "@/utils/cargoValidation";
+import { CargoFormRef } from "@/components/forms/CargoFormItem";
 
 export const useCargoFormList = () => {
   // Manage cargo form list
@@ -13,7 +14,7 @@ export const useCargoFormList = () => {
   }]);
 
   // Manage form errors
-  const [formErrors, setFormErrors] = useState<{ [key: number]: CargoFormErrors }>({});
+  const [formErrors, setFormErrors] = useState<{ [key: number]: CargoValidationErrors }>({});
   
   // Manage form references
   const formRefs = useRef<(CargoFormRef | null)[]>([]);
@@ -90,12 +91,12 @@ export const useCargoFormList = () => {
   // Validate all form items
   const validateAllInputs = () => {
     let hasErrors = false;
-    const newErrors: { [key: number]: CargoFormErrors } = {};
+    const newErrors: { [key: number]: CargoValidationErrors } = {};
     let firstErrorField: { index: number; field: keyof CargoFormData } | null = null;
 
     cargoItems.forEach((item, index) => {
       const validationErrors = validateForm(item);
-      const errors: CargoFormErrors = {
+      const errors: CargoValidationErrors = { 
         cargoType: validationErrors.cargoType || "",
         packageCount: validationErrors.packageCount || "",
         containerNumber: validationErrors.containerNumber || "",

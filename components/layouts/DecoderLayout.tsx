@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import { Button } from "@/components/ui/Button";
-import { CargoFormData } from "@/components/CargoFormItem";
-import OutputPanel from "@/components/OutputPanel";
+import { Button } from "@/components/shared/Button";
+import { CargoFormData } from "@/types/cargo";
+import OutputPanel from "@/components/shared/OutputPanel";
 
 interface DecoderLayoutProps {
   decoded: CargoFormData[];

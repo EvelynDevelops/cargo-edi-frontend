@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CargoFormData } from '@/components/CargoFormItem';
+import { CargoFormData } from '@/types/cargo'; 
 import { decodeEdi } from '@/services/edi';
 
 interface UseEdiDecoderResult {
