@@ -1,38 +1,37 @@
 "use client";
 
-import { useState, useRef } from "react";
-import CargoFormItem, { CargoFormData, CargoFormErrors, CargoFormRef } from "@/components/CargoFormItem";
+import { useState } from "react";
+import CargoFormItem from "@/components/CargoFormItem";
 import EdiOutputPanel from "@/components/OutputPanel";
 import ConfirmationModal from "@/components/ConfirmationModal";
 import { Button } from "@/components/ui/Button";
 import { prepareRequestData, processResponseData } from "@/utils/caseConverter";
-import { validateForm } from "@/utils/cargoValidation";
-import { saveAs } from 'file-saver';
+import { useCargoFormList } from "@/hooks/useCargoFormList";
 import { useClipboard } from "@/hooks/useClipboard";
 import { useFileDownload } from "@/hooks/useFileDownload";
+import { generateEdi } from "@/services/edi";
 
 export default function HomePage() {
-  // Initial cargo items list
-  const [cargoItems, setCargoItems] = useState<CargoFormData[]>([
-    {
-      containerNumber: "",
-      masterBillNumber: "",
-      houseBillNumber: "",
-    },
-  ]);
+  const {
+    cargoItems,
+    formErrors,
+    formRefs,
+    handleChange,
+    handleAdd,
+    handleDelete,
+    handleClearAll,
+    validateAllInputs,
+    registerFormRef,
+  } = useCargoFormList();
 
   // Output and state handling
   const [ediOutput, setEdiOutput] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formErrors, setFormErrors] = useState<{ [key: number]: CargoFormErrors }>({});
 
   const { copyToClipboard } = useClipboard();
   const { downloadFile } = useFileDownload();
-
-  // Check if string only contains letters and numbers
-  const isAlphaNumeric = (text: string) => /^[a-zA-Z0-9]*$/.test(text);
 
   // Download EDI result as .edi file
   const handleDownload = () => {
@@ -46,104 +45,10 @@ export default function HomePage() {
   const handleCopy = async () => {
     await copyToClipboard(ediOutput);
   };
-  
-
-  // Update cargoItems list when user edits a form field
-  const handleChange = (index: number, updated: CargoFormData) => {
-    const newItems = [...cargoItems];
-    newItems[index] = updated;
-    setCargoItems(newItems);
-    // clear the output due to form changes
-    setEdiOutput("");
-  };
-
-  // Add a new cargo item
-  const handleAdd = () => {
-    setCargoItems((prev) => [
-      ...prev,
-      {
-        containerNumber: "",
-        masterBillNumber: "",
-        houseBillNumber: "",
-      },
-    ]);
-    setEdiOutput("");
-  };
-
-  // Remove a cargo item
-  const handleDelete = (index: number) => {
-    if (cargoItems.length > 1) {
-      //splice 
-      setCargoItems((prev) => prev.filter((_, i) => i !== index));
-      // clear the form data
-      setEdiOutput("");
-    }
-  };
-
-  // Store refs for all form items
-  const formRefs = useRef<(CargoFormRef | null)[]>([]);
-
-  // Register form ref
-  const registerFormRef = (index: number, ref: CargoFormRef) => {
-    formRefs.current[index] = ref;
-  };
-
-  // Validate all fields before submission
-  const validateAllInputs = () => {
-    let hasErrors = false;
-    const newErrors: { [key: number]: CargoFormErrors } = {};
-    let firstErrorField: { index: number; field: keyof CargoFormData } | null = null;
-
-    cargoItems.forEach((item, index) => {
-      const validationErrors = validateForm(item);
-      const errors: CargoFormErrors = {
-        cargoType: validationErrors.cargoType || "",
-        packageCount: validationErrors.packageCount || "",
-        containerNumber: validationErrors.containerNumber || "",
-        masterBillNumber: validationErrors.masterBillNumber || "",
-        houseBillNumber: validationErrors.houseBillNumber || ""
-      };
-      
-      if (Object.values(errors).some(error => error !== "")) {
-        hasErrors = true;
-        newErrors[index] = errors;
-
-        // Track first error field if not already set
-        if (!firstErrorField) {
-          for (const [field, error] of Object.entries(errors)) {
-            if (error) {
-              firstErrorField = { index, field: field as keyof CargoFormData };
-              break;
-            }
-          }
-        }
-      }
-    });
-
-    // Update all form items with their errors
-    Object.entries(newErrors).forEach(([index, errors]) => {
-      const formRef = formRefs.current[Number(index)];
-      if (formRef) {
-        formRef.setFieldErrors(errors);
-      }
-    });
-
-    // Scroll to first error if exists
-    if (firstErrorField) {
-      const element = document.querySelector(`[data-form-index="${firstErrorField.index}"][data-field="${firstErrorField.field}"]`);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        (element as HTMLElement).focus();
-      }
-    }
-
-    return !hasErrors;
-  };
 
   // Submit and generate EDI if all inputs are valid
   const handleSubmit = async () => {
     if (!validateAllInputs()) {
-      alert("Some fields contain invalid characters. Please correct them as indicated in red before submitting.");
       return;
     }
 
@@ -152,21 +57,8 @@ export default function HomePage() {
     setEdiOutput("");
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/edi/generate`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(prepareRequestData({ cargoItems })),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail?.message || errorData.message || "Failed to generate EDI");
-      }
-
-      const data = await response.json();
-      setEdiOutput(processResponseData(data).edi);
+      const ediResult = await generateEdi(cargoItems);
+      setEdiOutput(ediResult);
     } catch (err: any) {
       setError(err.message || "Unknown error");
     } finally {
@@ -185,41 +77,6 @@ export default function HomePage() {
   // Close confirmation modal
   const handleCloseModal = () => {
     setIsModalOpen(false);
-  };
-
-  // Clear all cargo items
-  const handleClearAll = () => {
-    setCargoItems([
-      {
-        cargoType: undefined,
-        packageCount: undefined,
-        containerNumber: "",
-        masterBillNumber: "",
-        houseBillNumber: "",
-      }
-    ]);
-    setEdiOutput("");
-    setError("");
-    setFormErrors({});
-    formRefs.current.forEach(ref => {
-      if (ref) {
-        ref.setFieldErrors({
-          cargoType: "",
-          packageCount: "",
-          containerNumber: "",
-          masterBillNumber: "",
-          houseBillNumber: "",
-        });
-      }
-    });
-  };
-
-  // Handle form errors for each cargo item
-  const handleSetFieldErrors = (index: number) => (errors: CargoFormErrors) => {
-    setFormErrors(prev => ({
-      ...prev,
-      [index]: errors
-    }));
   };
 
   return (
@@ -246,13 +103,10 @@ export default function HomePage() {
               key={index}
               index={index}
               data={item}
+              errors={formErrors[index]}
               onChange={handleChange}
               onDelete={cargoItems.length > 1 ? () => handleDelete(index) : undefined}
-              ref={(el) => {
-                if (el) {
-                  registerFormRef(index, el);
-                }
-              }}
+              ref={(ref) => registerFormRef(index, ref)}
             />
           ))}
 

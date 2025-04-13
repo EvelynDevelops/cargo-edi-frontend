@@ -29,6 +29,7 @@ export interface CargoFormErrors {
 interface Props {
   index: number;
   data: CargoFormData;
+  errors?: CargoFormErrors;
   onChange: (index: number, updated: CargoFormData) => void;
   onDelete?: () => void;
   onValidate?: (index: number, isValid: boolean) => void;
@@ -41,11 +42,12 @@ export interface CargoFormRef {
 const CargoFormItem = forwardRef<CargoFormRef, Props>(({ 
   index, 
   data, 
+  errors = {}, 
   onChange, 
   onDelete, 
   onValidate
 }, ref) => {
-  const { errors, handleFieldChange, handleBlur, setFieldErrors } = useCargoForm({
+  const { handleFieldChange, handleBlur, setFieldErrors } = useCargoForm({
     index,
     data,
     onChange,
