@@ -56,7 +56,7 @@ export default function HomePage() {
 
     try {
       const ediResult = await generateEdi(cargoItems);
-      setEdiOutput(ediResult.edi);
+      setEdiOutput(ediResult);
     } catch (err: any) {
       setError(err.message || "Unknown error");
     } finally {

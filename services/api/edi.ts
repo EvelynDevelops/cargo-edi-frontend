@@ -1,34 +1,38 @@
 import { ICargoFormData } from "@/types/cargo";
-import { IDecodeRequest, IGenerateRequest, IApiResponse } from "@/types/api";
+import { prepareRequestData, processResponseData } from "@/utils/caseConverter";
 
-export async function generateEdi(cargoItems: ICargoFormData[]): Promise<IApiResponse> {
-  const response = await fetch('/api/generate-edi', {
-    method: 'POST',
+export async function generateEdi(cargoItems: ICargoFormData[]) {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/edi/generate`, {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify({ cargo_items: cargoItems }),
+    body: JSON.stringify(prepareRequestData({ cargoItems })),
   });
 
   if (!response.ok) {
-    throw new Error('Failed to generate EDI');
+    const errorData = await response.json();
+    throw new Error(errorData.detail?.message || errorData.message || "Failed to generate EDI");
   }
 
-  return response.json();
+  const data = await response.json();
+  return processResponseData(data).edi;
 }
 
-export async function decodeEdi(edi: string): Promise<IApiResponse> {
-  const response = await fetch('/api/decode-edi', {
-    method: 'POST',
+export async function decodeEdi(ediContent: string) {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/edi/decode`, {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify({ edi }),
+    body: JSON.stringify({ edi: ediContent }),
   });
 
   if (!response.ok) {
-    throw new Error('Failed to decode EDI');
+    const errorData = await response.json();
+    throw new Error(errorData.detail?.message || errorData.message || "Failed to decode EDI");
   }
 
-  return response.json();
+  const data = await response.json();
+  return processResponseData(data).cargoItems;
 } 

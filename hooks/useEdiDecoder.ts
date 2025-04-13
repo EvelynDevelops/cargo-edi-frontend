@@ -34,7 +34,7 @@ export function useEdiDecoder(): IUseEdiDecoderResult {
     setError("");
     try {
       const decodedItems = await decodeEdi(input);
-      setDecoded(decodedItems.cargo_items || []); 
+      setDecoded(decodedItems);
     } catch (err: any) {
       setError(err.message);
     } finally {
