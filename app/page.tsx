@@ -7,6 +7,8 @@ import ConfirmationModal from "@/components/ConfirmationModal";
 import { Button } from "@/components/ui/Button";
 import { prepareRequestData, processResponseData } from "@/utils/caseConverter";
 import { saveAs } from 'file-saver';
+import { useClipboard } from "@/hooks/useClipboard";
+import { useFileDownload } from "@/hooks/useFileDownload";
 
 export default function HomePage() {
   // Initial cargo items list
@@ -25,23 +27,23 @@ export default function HomePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formErrors, setFormErrors] = useState<{ [key: number]: CargoFormErrors }>({});
 
+  const { copyToClipboard } = useClipboard();
+  const { downloadFile } = useFileDownload();
+
   // Check if string only contains letters and numbers
   const isAlphaNumeric = (text: string) => /^[a-zA-Z0-9]*$/.test(text);
 
   // Download EDI result as .edi file
   const handleDownload = () => {
-    const blob = new Blob([ediOutput], { type: "text/plain;charset=utf-8" });
-    saveAs(blob, "cargo_message.edi");
+    downloadFile(ediOutput, {
+      type: "text/plain;charset=utf-8",
+      filename: "cargo_message.edi"
+    });
   };
 
   // Copy EDI output to clipboard
   const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(ediOutput);
-    } catch (err) {
-      //todo: use a formal logging library
-      console.error("Failed to copy", err);
-    }
+    await copyToClipboard(ediOutput);
   };
   
 
