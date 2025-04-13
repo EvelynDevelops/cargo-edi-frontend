@@ -6,7 +6,7 @@ import EdiTextArea from "./EdiTextArea";
 import { useEdiEditor } from "@/hooks/useEdiEditor";
 
 // Define interfaces
-interface EdiTextEditorProps {
+interface IEdiTextEditorProps {
   onDecode: (input: string) => void;
   onInputChange?: () => void;
   loading?: boolean;
@@ -14,7 +14,7 @@ interface EdiTextEditorProps {
   setError?: (error: string) => void;
 }
 
-interface EdiTextEditorRef {
+interface IEdiTextEditorRef {
   handleDecode: () => void;
   handleClear: () => void;
   getInput: () => string;
@@ -24,7 +24,7 @@ interface EdiTextEditorRef {
  * EDI Text Editor Component
  * Used for editing and parsing EDI content
  */
-const EdiTextEditor = forwardRef<EdiTextEditorRef, EdiTextEditorProps>(function EdiTextEditor({ 
+const EdiTextEditor = forwardRef<IEdiTextEditorRef, IEdiTextEditorProps>(function EdiTextEditor({ 
   onDecode, 
   onInputChange,
   loading = false,

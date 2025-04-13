@@ -4,7 +4,7 @@ import { ICargoFormData } from "@/types/cargo";
 import { Button } from "@/components/shared/Button";
 import EdiOutputPanel from "@/components/shared/OutputPanel";
 
-interface HomeLayoutProps {
+interface IHomeLayoutProps {
   cargoItems: ICargoFormData[];
   loading: boolean;
   error: string;
@@ -32,7 +32,7 @@ export default function HomeLayout({
   onDownload,
   onCopy,
   children
-}: HomeLayoutProps) {
+}: IHomeLayoutProps) {
   return (
     <main className="pt-16">
       <h1 className="text-2xl font-bold mb-6">Cargo EDI Generator</h1>

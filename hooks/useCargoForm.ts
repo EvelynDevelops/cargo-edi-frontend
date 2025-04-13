@@ -2,14 +2,14 @@ import { useState, useEffect } from "react";
 import { ICargoFormData, ICargoValidationErrors } from "@/types/cargo";
 import { validateField } from "@/utils/cargoValidation";
 
-interface UseCargoFormProps {
+interface IUseCargoFormProps {
   index: number;
   data: ICargoFormData;
   onChange: (index: number, updated: ICargoFormData) => void;
   onValidate?: (index: number, isValid: boolean) => void;
 }
 
-export const useCargoForm = ({ index, data, onChange, onValidate }: UseCargoFormProps) => {
+export const useCargoForm = ({ index, data, onChange, onValidate }: IUseCargoFormProps) => {
   const [errors, setErrors] = useState<ICargoValidationErrors>({
     cargoType: "",
     packageCount: "",

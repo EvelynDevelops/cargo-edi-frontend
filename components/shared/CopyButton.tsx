@@ -3,12 +3,12 @@
 import React, { useState } from "react";
 import SuccessIcon from "@/public/icons/SuccessIcon";
 
-type Props = {
+interface ICopyButtonProps {
   onCopy: () => void;
   className?: string;
-};
+}
 
-const CopyButton: React.FC<Props> = ({ onCopy, className = "" }) => {
+const CopyButton: React.FC<ICopyButtonProps> = ({ onCopy, className = "" }) => {
   const [isCopied, setIsCopied] = useState(false);
 
   // Handle the copy logic when the button is clicked

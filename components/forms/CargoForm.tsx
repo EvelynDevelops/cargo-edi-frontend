@@ -3,7 +3,7 @@ import { useForm } from '@/hooks/useForm';
 import { ICargoFormData } from '@/types/cargo';
 import { validateForm } from '@/utils/cargoValidation';
 
-interface CargoFormProps {
+interface ICargoFormProps {
   initialData: ICargoFormData;
   onSubmit: (data: ICargoFormData) => Promise<void>;
 }
@@ -11,7 +11,7 @@ interface CargoFormProps {
 /**
  * Example component using the useForm hook
  */
-export default function CargoForm({ initialData, onSubmit }: CargoFormProps) {
+export default function CargoForm({ initialData, onSubmit }: ICargoFormProps) {
   const {
     values,
     errors,

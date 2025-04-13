@@ -2,7 +2,7 @@
 
 import React from "react";
 
-interface ErrorPanelProps {
+interface IErrorPanelProps {
   error: string;
 }
 
@@ -48,7 +48,7 @@ const parseEdiFormatError = (error: string): string[] => {
  * Displays error messages with appropriate formatting
  * Handles both EDI format errors and regular errors
  */
-const ErrorPanel: React.FC<ErrorPanelProps> = ({ error }) => {
+const ErrorPanel: React.FC<IErrorPanelProps> = ({ error }) => {
   if (!error) return null;
 
   // Check if it's an EDI format error

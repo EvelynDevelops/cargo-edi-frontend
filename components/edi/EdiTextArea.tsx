@@ -1,7 +1,7 @@
 import React from 'react';
 import ErrorLineHighlighter from './ErrorLineHighlighter';
 
-interface EdiTextAreaProps {
+interface IEdiTextAreaProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   textareaRef: React.RefObject<HTMLTextAreaElement>;
@@ -13,7 +13,7 @@ interface EdiTextAreaProps {
  * EDI text area component
  * Used for editing and displaying EDI content with error highlighting
  */
-const EdiTextArea: React.FC<EdiTextAreaProps> = ({ 
+const EdiTextArea: React.FC<IEdiTextAreaProps> = ({ 
   value, 
   onChange, 
   textareaRef,

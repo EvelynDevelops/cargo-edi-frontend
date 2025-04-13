@@ -1,7 +1,7 @@
 import React from "react";
 import { TextInput } from "@/components/shared/TextInput";
 
-interface PackageCountInputProps {
+interface IPackageCountInputProps {
   value?: number;
   onChange: (value: number) => void;
   onBlur: (value: string) => void;
@@ -10,7 +10,7 @@ interface PackageCountInputProps {
   "data-testid"?: string;
 }
 
-const PackageCountInput: React.FC<PackageCountInputProps> = ({
+const PackageCountInput: React.FC<IPackageCountInputProps> = ({
   value,
   onChange,
   onBlur,

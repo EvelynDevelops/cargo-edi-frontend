@@ -8,7 +8,7 @@ import CargoTypeSelect from "@/components/forms/CargoTypeSelect";
 import PackageCountInput from "@/components/forms/PackageCountInput";   
 import { ICargoFormData, CargoType, ICargoValidationErrors } from "@/types/cargo";
 
-interface Props {
+interface ICargoFormItemProps {
   index: number;
   data: ICargoFormData;
   errors?: ICargoValidationErrors;
@@ -21,7 +21,7 @@ export interface CargoFormRef {
   setFieldErrors: (errors: ICargoValidationErrors) => void;
 }
 
-const CargoFormItem = forwardRef<CargoFormRef, Props>(({ 
+const CargoFormItem = forwardRef<CargoFormRef, ICargoFormItemProps>(({ 
   index, 
   data, 
   errors = {}, 

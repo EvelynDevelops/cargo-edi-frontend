@@ -1,6 +1,6 @@
 import React from 'react';
 
-interface ErrorLineHighlighterProps {
+interface IErrorLineHighlighterProps {
   errorLines: number[];
   lineHeight: number;
   lines: string[];
@@ -10,7 +10,7 @@ interface ErrorLineHighlighterProps {
  * Error line highlighter component
  * Used to highlight error lines in the text editor
  */
-const ErrorLineHighlighter: React.FC<ErrorLineHighlighterProps> = ({ 
+const ErrorLineHighlighter: React.FC<IErrorLineHighlighterProps> = ({ 
   errorLines, 
   lineHeight, 
   lines 

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-interface NavItem {
+interface INavItem {
   href: string;
   label: string;
 }
@@ -12,7 +12,7 @@ interface NavItem {
  * Navigation configuration
  * Define all navigation items here for easy maintenance
  */
-const NAV_ITEMS: NavItem[] = [
+const NAV_ITEMS: INavItem[] = [
   {
     href: "/",
     label: "Generate EDI"

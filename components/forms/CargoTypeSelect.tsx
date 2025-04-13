@@ -1,7 +1,7 @@
 import React from "react";
 import { CargoType } from "@/types/cargo";
 
-interface CargoTypeSelectProps {
+interface ICargoTypeSelectProps {
   value?: CargoType;
   onChange: (value: CargoType | undefined) => void;
   onBlur: (value: string) => void;
@@ -10,7 +10,7 @@ interface CargoTypeSelectProps {
   "data-testid"?: string;
 }
 
-const CargoTypeSelect: React.FC<CargoTypeSelectProps> = ({
+const CargoTypeSelect: React.FC<ICargoTypeSelectProps> = ({
   value,
   onChange,
   onBlur,

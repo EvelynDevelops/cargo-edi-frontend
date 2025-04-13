@@ -10,7 +10,7 @@ import { ICargoFormData } from "@/types/cargo";
  * @property {number} index - The index of the cargo item in the list
  * @property {boolean} readOnly - Whether the card is in read-only mode
  */
-interface Props {
+interface ICargoCardProps {
   data: ICargoFormData;
   index: number;
   readOnly?: boolean;
@@ -19,7 +19,7 @@ interface Props {
 /**
  * CargoCard component displays cargo information in a card format
  */
-const CargoCard: React.FC<Props> = ({ data, index, readOnly = true }) => {
+const CargoCard: React.FC<ICargoCardProps> = ({ data, index, readOnly = true }) => {
   return (
     <div className="bg-white border border-gray-300 rounded-xl px-6 py-4 shadow-sm space-y-2 relative w-[420px]">
       {/* Card header with cargo item number */}

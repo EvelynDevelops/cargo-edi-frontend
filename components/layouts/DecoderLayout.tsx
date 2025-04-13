@@ -5,7 +5,7 @@ import { Button } from "@/components/shared/Button";
 import { ICargoFormData } from "@/types/cargo";
 import OutputPanel from "@/components/shared/OutputPanel";
 
-interface DecoderLayoutProps {
+interface IDecoderLayoutProps {
   decoded: ICargoFormData[];
   loading: boolean;
   error: string;
@@ -29,7 +29,7 @@ export default function DecoderLayout({
   onDownload,
   onCopy,
   children
-}: DecoderLayoutProps) {
+}: IDecoderLayoutProps) {
   return (
     <main className="pt-16">
       <h1 className="text-2xl font-bold mb-6">Decode Existing EDI</h1>

@@ -7,7 +7,7 @@ import { Button } from "@/components/shared/Button";
 /**
  * Props for the OutputPanel component
  */
-interface OutputPanelProps {
+interface IOutputPanelProps {
   ediOutput: string;
   onDownload: () => void;
   onCopy: () => void;
@@ -25,7 +25,7 @@ const DEFAULT_PLACEHOLDER = "EDI string will appear here...";
  * OutputPanel Component
  * Displays EDI output with copy and download functionality
  */
-const OutputPanel: React.FC<OutputPanelProps> = ({
+const OutputPanel: React.FC<IOutputPanelProps> = ({
   ediOutput,
   onDownload,
   onCopy,

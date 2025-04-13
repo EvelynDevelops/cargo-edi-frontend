@@ -9,7 +9,7 @@ import { Button } from "@/components/shared/Button";
  * @property {Function} onConfirm - Callback function to handle confirmation
  * @property {ICargoFormData[]} cargoItems - Array of cargo items to display
  */
-interface ConfirmationModalProps {
+interface IConfirmationModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (updatedItems: ICargoFormData[]) => void;
@@ -17,7 +17,7 @@ interface ConfirmationModalProps {
 }
 
 
-const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
+const ConfirmationModal: React.FC<IConfirmationModalProps> = ({
   isOpen,
   onClose,
   onConfirm,

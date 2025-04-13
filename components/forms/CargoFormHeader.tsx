@@ -1,12 +1,12 @@
 import React from "react";
 import CrossIcon from "@/public/icons/CrossIcon";
 
-interface CargoFormHeaderProps {
+interface ICargoFormHeaderProps {
   index: number;
   onDelete?: () => void;
 }
 
-const CargoFormHeader: React.FC<CargoFormHeaderProps> = ({ index, onDelete }) => {
+const CargoFormHeader: React.FC<ICargoFormHeaderProps> = ({ index, onDelete }) => {
   return (
     <div className="flex items-center justify-between mb-6">
       <h3 className="text-xl font-semibold">Cargo Item #{index + 1}</h3>

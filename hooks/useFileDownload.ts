@@ -1,6 +1,6 @@
 import { saveAs } from 'file-saver';
 
-interface DownloadOptions {
+interface IFileDownloadOptions {
   type?: string;
   filename?: string;
 }
@@ -11,7 +11,7 @@ interface DownloadOptions {
 export function useFileDownload() {
   const downloadFile = (
     content: string,
-    options: DownloadOptions = {}
+    options: IFileDownloadOptions = {}
   ) => {
     const {
       type = 'text/plain;charset=utf-8',

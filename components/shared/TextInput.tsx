@@ -1,7 +1,7 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 
-export interface TextInputProps
+export interface ITextInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string
   error?: string
@@ -11,7 +11,7 @@ export interface TextInputProps
   errorClassName?: string
 }
 
-const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
+const TextInput = React.forwardRef<HTMLInputElement, ITextInputProps>(
   ({ 
     className,
     label,
