@@ -1,7 +1,7 @@
 export type CargoType = 'FCL' | 'LCL' | 'FCX' | '';
 
 export interface ICargoFormData {
-  id?: string;
+  id: number;  // 改为必填字段
   cargoType?: CargoType;
   packageCount?: number;
   containerNumber?: string;  // Optional, only required when cargoType is 'FCL'
@@ -15,4 +15,4 @@ export interface ICargoValidationErrors {
   containerNumber?: string;
   masterBillNumber?: string;
   houseBillNumber?: string;
-} 
+}

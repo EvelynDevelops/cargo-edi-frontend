@@ -92,7 +92,7 @@ export default function HomePage() {
       >
         {cargoItems.map((item, index) => (
           <CargoFormItem
-            key={index}
+            key={item.id}
             index={index}
             data={item}
             errors={formErrors[index]}

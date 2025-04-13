@@ -5,7 +5,9 @@ import { CargoFormRef } from "@/components/forms/CargoFormItem";
 
 export const useCargoFormList = () => {
   // Manage cargo form list
+  const [nextId, setNextId] = useState(1);
   const [cargoItems, setCargoItems] = useState<ICargoFormData[]>([{
+    id: 1,
     cargoType: undefined,
     packageCount: undefined,
     containerNumber: "",
@@ -29,12 +31,14 @@ export const useCargoFormList = () => {
   // Add new form item
   const handleAdd = () => {
     setCargoItems(prev => [...prev, {
+      id: nextId + 1,
       cargoType: undefined,
       packageCount: undefined,
       containerNumber: "",
       masterBillNumber: "",
       houseBillNumber: "",
     }]);
+    setNextId(prev => prev + 1);
   };
 
   // Delete form item
@@ -63,12 +67,14 @@ export const useCargoFormList = () => {
   // Clear all forms
   const handleClearAll = () => {
     setCargoItems([{
+      id: 1,
       cargoType: undefined,
       packageCount: undefined,
       containerNumber: "",
       masterBillNumber: "",
       houseBillNumber: "",
     }]);
+    setNextId(1);
     setFormErrors({});
     formRefs.current.forEach(ref => {
       if (ref) {
