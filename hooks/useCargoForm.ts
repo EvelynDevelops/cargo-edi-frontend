@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { CargoFormData, CargoFormErrors, CargoType } from "@/components/CargoFormItem";
+import { CargoFormData, CargoValidationErrors } from "@/types/cargo";
 import { validateField } from "@/utils/cargoValidation";
 
 interface UseCargoFormProps {
@@ -10,7 +10,7 @@ interface UseCargoFormProps {
 }
 
 export const useCargoForm = ({ index, data, onChange, onValidate }: UseCargoFormProps) => {
-  const [errors, setErrors] = useState<CargoFormErrors>({
+  const [errors, setErrors] = useState<CargoValidationErrors>({
     cargoType: "",
     packageCount: "",
     containerNumber: "",
@@ -41,7 +41,7 @@ export const useCargoForm = ({ index, data, onChange, onValidate }: UseCargoForm
     setErrors(prev => ({ ...prev, [field]: error }));
   };
 
-  const setFieldErrors = (newErrors: CargoFormErrors) => {
+  const setFieldErrors = (newErrors: CargoValidationErrors) => {
     setErrors(newErrors);
   };
 

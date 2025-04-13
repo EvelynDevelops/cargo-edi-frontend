@@ -6,37 +6,19 @@ import { useCargoForm } from "@/hooks/useCargoForm";
 import CargoFormHeader from "./forms/CargoFormHeader";
 import CargoTypeSelect from "./forms/CargoTypeSelect";
 import PackageCountInput from "./forms/PackageCountInput";
-
-export type CargoType = "FCX" | "LCL" | "FCL";
-
-export interface CargoFormData {
-  id?: string;
-  cargoType?: CargoType;
-  packageCount?: number;
-  containerNumber?: string;
-  masterBillNumber?: string;
-  houseBillNumber?: string;
-}
-
-export interface CargoFormErrors {
-  cargoType: string;
-  packageCount: string;
-  containerNumber: string;
-  masterBillNumber: string;
-  houseBillNumber: string;
-}
+import { CargoFormData, CargoType, CargoValidationErrors } from "@/types/cargo";
 
 interface Props {
   index: number;
   data: CargoFormData;
-  errors?: CargoFormErrors;
+  errors?: CargoValidationErrors;
   onChange: (index: number, updated: CargoFormData) => void;
   onDelete?: () => void;
   onValidate?: (index: number, isValid: boolean) => void;
 }
 
 export interface CargoFormRef {
-  setFieldErrors: (errors: CargoFormErrors) => void;
+  setFieldErrors: (errors: CargoValidationErrors) => void;
 }
 
 const CargoFormItem = forwardRef<CargoFormRef, Props>(({ 

@@ -1,4 +1,4 @@
-import { CargoFormData, CargoType } from "@/components/CargoFormItem";
+import { CargoFormData, CargoType } from "@/types/cargo";
 
 interface ValidationRule {
   validate: (value: any, data: CargoFormData) => boolean;
