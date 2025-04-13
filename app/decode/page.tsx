@@ -47,7 +47,7 @@ export default function DecodePage() {
     setError("");
     try {
       // Make API request to decode EDI message
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/decode-edi`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/edi/decode`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

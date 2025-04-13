@@ -179,7 +179,7 @@ export default function HomePage() {
     setEdiOutput("");
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/generate-edi`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/edi/generate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
