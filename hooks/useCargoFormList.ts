@@ -44,7 +44,10 @@ export const useCargoFormList = () => {
   // Delete form item
   const handleDelete = (index: number) => {
     if (cargoItems.length > 1) {
-      setCargoItems(prev => prev.filter((_, i) => i !== index));
+      const newItems = [...cargoItems];
+      newItems.splice(index, 1);
+      setCargoItems(newItems);
+      
       // Clear corresponding error messages
       setFormErrors(prev => {
         const newErrors = { ...prev };
