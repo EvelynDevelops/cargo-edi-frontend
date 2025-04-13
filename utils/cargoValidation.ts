@@ -1,16 +1,16 @@
-import { CargoFormData, CargoType } from "@/types/cargo";
+import { ICargoFormData, CargoType } from "@/types/cargo";
 
-interface ValidationRule {
-  validate: (value: any, data: CargoFormData) => boolean;
+interface IValidationRule {
+  validate: (value: any, data: ICargoFormData) => boolean;
   message: string;
 }
 
-interface ValidationRules {
-  [key: string]: ValidationRule[];
+interface IValidationRules {
+  [key: string]: IValidationRule[];
 }
 
 // Validation rules
-const validationRules: ValidationRules = {
+const IValidationRules: IValidationRules = {
   cargoType: [
     {
       validate: (value) => value !== undefined && value !== "",
@@ -52,8 +52,8 @@ const validationRules: ValidationRules = {
 };
 
 // Validate a single field
-export const validateField = (field: keyof CargoFormData, value: any, data: CargoFormData): string => {
-  const rules = validationRules[field];
+export const validateField = (field: keyof ICargoFormData, value: any, data: ICargoFormData): string => {
+  const rules = IValidationRules[field];
   if (!rules) return "";
 
   for (const rule of rules) {
@@ -66,12 +66,12 @@ export const validateField = (field: keyof CargoFormData, value: any, data: Carg
 };
 
 // Validate the entire form
-export const validateForm = (data: CargoFormData): { [key: string]: string } => {
+export const validateForm = (data: ICargoFormData): { [key: string]: string } => {
   const errors: { [key: string]: string } = {};
 
-  for (const field in validationRules) {
-    const value = data[field as keyof CargoFormData];
-    const error = validateField(field as keyof CargoFormData, value, data);
+  for (const field in IValidationRules) {
+    const value = data[field as keyof ICargoFormData];
+    const error = validateField(field as keyof ICargoFormData, value, data);
     if (error) {
       errors[field] = error;
     }

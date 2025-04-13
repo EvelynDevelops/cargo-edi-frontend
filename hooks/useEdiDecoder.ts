@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { CargoFormData } from '@/types/cargo'; 
-import { decodeEdi } from '@/services/edi';
+import { ICargoFormData } from '@/types/cargo'; 
+import { decodeEdi } from '@/services/api/edi';
 
-interface UseEdiDecoderResult {
-  decoded: CargoFormData[];
+interface IUseEdiDecoderResult {  
+  decoded: ICargoFormData[];
   loading: boolean;
   error: string;
   handleDecode: (input: string) => Promise<void>;
@@ -14,8 +14,8 @@ interface UseEdiDecoderResult {
 /**
  * Hook for handling EDI decoding operations
  */
-export function useEdiDecoder(): UseEdiDecoderResult {
-  const [decoded, setDecoded] = useState<CargoFormData[]>([]);
+export function useEdiDecoder(): IUseEdiDecoderResult {
+  const [decoded, setDecoded] = useState<ICargoFormData[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -34,7 +34,7 @@ export function useEdiDecoder(): UseEdiDecoderResult {
     setError("");
     try {
       const decodedItems = await decodeEdi(input);
-      setDecoded(decodedItems);
+      setDecoded(decodedItems.cargo_items || []); 
     } catch (err: any) {
       setError(err.message);
     } finally {

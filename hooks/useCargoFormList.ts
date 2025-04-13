@@ -1,11 +1,11 @@
 import { useState, useRef } from "react";
-import { CargoFormData, CargoValidationErrors } from "@/types/cargo"; 
+import { ICargoFormData, ICargoValidationErrors } from "@/types/cargo"; 
 import { validateForm } from "@/utils/cargoValidation";
 import { CargoFormRef } from "@/components/forms/CargoFormItem";
 
 export const useCargoFormList = () => {
   // Manage cargo form list
-  const [cargoItems, setCargoItems] = useState<CargoFormData[]>([{
+  const [cargoItems, setCargoItems] = useState<ICargoFormData[]>([{
     cargoType: undefined,
     packageCount: undefined,
     containerNumber: "",
@@ -14,13 +14,13 @@ export const useCargoFormList = () => {
   }]);
 
   // Manage form errors
-  const [formErrors, setFormErrors] = useState<{ [key: number]: CargoValidationErrors }>({});
+  const [formErrors, setFormErrors] = useState<{ [key: number]: ICargoValidationErrors }>({});
   
   // Manage form references
   const formRefs = useRef<(CargoFormRef | null)[]>([]);
 
   // Handle form item changes
-  const handleChange = (index: number, updated: CargoFormData) => {
+  const handleChange = (index: number, updated: ICargoFormData) => {
     const newItems = [...cargoItems];
     newItems[index] = updated;
     setCargoItems(newItems);
@@ -91,12 +91,12 @@ export const useCargoFormList = () => {
   // Validate all form items
   const validateAllInputs = () => {
     let hasErrors = false;
-    const newErrors: { [key: number]: CargoValidationErrors } = {};
-    let firstErrorField: { index: number; field: keyof CargoFormData } | null = null;
+    const newErrors: { [key: number]: ICargoValidationErrors } = {};
+    let firstErrorField: { index: number; field: keyof ICargoFormData } | null = null;
 
     cargoItems.forEach((item, index) => {
       const validationErrors = validateForm(item);
-      const errors: CargoValidationErrors = { 
+      const errors: ICargoValidationErrors = { 
         cargoType: validationErrors.cargoType || "",
         packageCount: validationErrors.packageCount || "",
         containerNumber: validationErrors.containerNumber || "",
@@ -112,7 +112,7 @@ export const useCargoFormList = () => {
         if (!firstErrorField) {
           for (const [field, error] of Object.entries(errors)) {
             if (error) {
-              firstErrorField = { index, field: field as keyof CargoFormData };
+              firstErrorField = { index, field: field as keyof ICargoFormData };
               break;
             }
           }

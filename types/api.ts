@@ -1,10 +1,10 @@
-import { CargoFormData } from "@/types/cargo";
+import { ICargoFormData } from "@/types/cargo";
 
 /**
  * API response interface for EDI operations
  */
 export interface IApiResponse {
-  cargo_items?: CargoFormData[];
+  cargo_items?: ICargoFormData[];
   logs?: string[];
   error?: string;
   message?: string;
@@ -12,6 +12,9 @@ export interface IApiResponse {
     message?: string;
     logs?: string[];
   };
+  edi?: string;
+  status?: string;
+  item_count?: number;
 }
 
 /**
@@ -25,5 +28,5 @@ export interface IDecodeRequest {
  * API request interface for EDI generate operation
  */
 export interface IGenerateRequest {
-  cargo_items: CargoFormData[];
+  cargo_items: ICargoFormData[];
 } 

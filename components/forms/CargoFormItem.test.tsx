@@ -2,10 +2,10 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import CargoFormItem from './CargoFormItem';
-import { CargoFormData } from '@/types/cargo';
+import { ICargoFormData } from '@/types/cargo';
 
 describe('CargoFormItem', () => {
-  const mockData: CargoFormData = {
+  const mockData: ICargoFormData = {
     cargoType: 'FCL',
     packageCount: 10,
     containerNumber: 'CONT123',
@@ -110,7 +110,7 @@ describe('CargoFormItem', () => {
   });
 
   it('handles empty initial data correctly', () => {
-    const emptyData: CargoFormData = {
+    const emptyData: ICargoFormData = {
       cargoType: undefined,
       packageCount: undefined,
       containerNumber: '',

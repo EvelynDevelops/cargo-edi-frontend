@@ -1,12 +1,12 @@
 import { useState, useCallback, useEffect } from 'react';
 
-interface UseFormOptions<T> {
+interface IUseFormOptions<T> {
   initialValues: T;
   onSubmit: (values: T) => Promise<void>;
   validate?: (values: T) => Partial<Record<keyof T, string>>;
 }
 
-interface UseFormResult<T> {
+interface IUseFormResult<T> {
   values: T;
   errors: Partial<Record<keyof T, string>>;
   touched: Partial<Record<keyof T, boolean>>;
@@ -28,7 +28,7 @@ export function useForm<T extends Record<string, any>>({
   initialValues,
   onSubmit,
   validate
-}: UseFormOptions<T>): UseFormResult<T> {
+}: IUseFormOptions<T>): IUseFormResult<T> {
   const [values, setValues] = useState<T>(initialValues);
   const [errors, setErrors] = useState<Partial<Record<keyof T, string>>>({});
   const [touched, setTouched] = useState<Partial<Record<keyof T, boolean>>>({});

@@ -1,11 +1,11 @@
 import React from 'react';
 import { useForm } from '@/hooks/useForm';
-import { CargoFormData } from '@/types/cargo';
+import { ICargoFormData } from '@/types/cargo';
 import { validateForm } from '@/utils/cargoValidation';
 
 interface CargoFormProps {
-  initialData: CargoFormData;
-  onSubmit: (data: CargoFormData) => Promise<void>;
+  initialData: ICargoFormData;
+  onSubmit: (data: ICargoFormData) => Promise<void>;
 }
 
 /**
@@ -19,7 +19,7 @@ export default function CargoForm({ initialData, onSubmit }: CargoFormProps) {
     handleChange,
     handleBlur,
     handleSubmit
-  } = useForm<CargoFormData>({
+  } = useForm<ICargoFormData>({
     initialValues: initialData,
     validate: validateForm,
     onSubmit

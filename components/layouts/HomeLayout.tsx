@@ -1,11 +1,11 @@
 "use client";
 
-import { CargoFormData } from "@/types/cargo";
+import { ICargoFormData } from "@/types/cargo";
 import { Button } from "@/components/shared/Button";
 import EdiOutputPanel from "@/components/shared/OutputPanel";
 
 interface HomeLayoutProps {
-  cargoItems: CargoFormData[];
+  cargoItems: ICargoFormData[];
   loading: boolean;
   error: string;
   ediOutput: string;

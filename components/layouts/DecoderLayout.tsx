@@ -2,11 +2,11 @@
 
 import React from "react";
 import { Button } from "@/components/shared/Button";
-import { CargoFormData } from "@/types/cargo";
+import { ICargoFormData } from "@/types/cargo";
 import OutputPanel from "@/components/shared/OutputPanel";
 
 interface DecoderLayoutProps {
-  decoded: CargoFormData[];
+  decoded: ICargoFormData[];
   loading: boolean;
   error: string;
   onClearAll: () => void;

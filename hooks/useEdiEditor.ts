@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 
-interface UseEdiEditorProps {
+interface IUseEdiEditorProps {
   onDecode: (input: string) => void;
   onInputChange?: () => void;
   error?: string;
   setError?: (error: string) => void;
 }
 
-interface UseEdiEditorResult {
+interface IUseEdiEditorResult {
   input: string;
   errorLines: number[];
   lines: string[];
@@ -27,7 +27,7 @@ export const useEdiEditor = ({
   onInputChange,
   error = "",
   setError
-}: UseEdiEditorProps): UseEdiEditorResult => {
+}: IUseEdiEditorProps): IUseEdiEditorResult => {
   const [input, setInput] = useState("");
   const [errorLines, setErrorLines] = useState<number[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);

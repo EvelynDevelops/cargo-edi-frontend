@@ -1,17 +1,17 @@
 "use client";
 
 import React from "react";
-import { CargoFormData } from "@/types/cargo";
+import { ICargoFormData } from "@/types/cargo";
 
 
 /**
  * Props for the CargoCard component
- * @property {CargoFormData} data - The cargo data to display
+ * @property {ICargoFormData} data - The cargo data to display
  * @property {number} index - The index of the cargo item in the list
  * @property {boolean} readOnly - Whether the card is in read-only mode
  */
 interface Props {
-  data: CargoFormData;
+  data: ICargoFormData;
   index: number;
   readOnly?: boolean;
 }

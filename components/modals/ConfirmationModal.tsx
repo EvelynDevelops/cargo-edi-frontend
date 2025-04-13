@@ -1,5 +1,5 @@
 import React from 'react';
-import type { CargoFormData } from '@/types/cargo';
+import type { ICargoFormData } from '@/types/cargo';
 import CargoCard from '@/components/shared/CargoCard';
 import { Button } from "@/components/shared/Button";
 
@@ -7,13 +7,13 @@ import { Button } from "@/components/shared/Button";
  * @property {boolean} isOpen - Whether the modal is open
  * @property {Function} onClose - Callback function to close the modal
  * @property {Function} onConfirm - Callback function to handle confirmation
- * @property {CargoFormData[]} cargoItems - Array of cargo items to display
+ * @property {ICargoFormData[]} cargoItems - Array of cargo items to display
  */
 interface ConfirmationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (updatedItems: CargoFormData[]) => void;
-  cargoItems: CargoFormData[];
+  onConfirm: (updatedItems: ICargoFormData[]) => void;
+  cargoItems: ICargoFormData[];
 }
 
 

@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
-import { CargoFormData, CargoValidationErrors } from "@/types/cargo";
+import { ICargoFormData, ICargoValidationErrors } from "@/types/cargo";
 import { validateField } from "@/utils/cargoValidation";
 
 interface UseCargoFormProps {
   index: number;
-  data: CargoFormData;
-  onChange: (index: number, updated: CargoFormData) => void;
+  data: ICargoFormData;
+  onChange: (index: number, updated: ICargoFormData) => void;
   onValidate?: (index: number, isValid: boolean) => void;
 }
 
 export const useCargoForm = ({ index, data, onChange, onValidate }: UseCargoFormProps) => {
-  const [errors, setErrors] = useState<CargoValidationErrors>({
+  const [errors, setErrors] = useState<ICargoValidationErrors>({
     cargoType: "",
     packageCount: "",
     containerNumber: "",
@@ -26,7 +26,7 @@ export const useCargoForm = ({ index, data, onChange, onValidate }: UseCargoForm
     }
   }, [errors, index, onValidate]);
 
-  const handleFieldChange = (field: keyof CargoFormData, value: any) => {
+  const handleFieldChange = (field: keyof ICargoFormData, value: any) => {
     const updatedData = { ...data, [field]: value };
     onChange(index, updatedData);
 
@@ -35,13 +35,13 @@ export const useCargoForm = ({ index, data, onChange, onValidate }: UseCargoForm
     setErrors(prev => ({ ...prev, [field]: error }));
   };
 
-  const handleBlur = (field: keyof CargoFormData, value: any) => {
+  const handleBlur = (field: keyof ICargoFormData, value: any) => {
     // Validate the field on blur
     const error = validateField(field, value, data);
     setErrors(prev => ({ ...prev, [field]: error }));
   };
 
-  const setFieldErrors = (newErrors: CargoValidationErrors) => {
+  const setFieldErrors = (newErrors: ICargoValidationErrors) => {
     setErrors(newErrors);
   };
 

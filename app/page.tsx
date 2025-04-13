@@ -3,7 +3,7 @@
 import { useState } from "react";
 import CargoFormItem from "@/components/forms/CargoFormItem";
 import ConfirmationModal from "@/components/modals/ConfirmationModal";
-import { generateEdi } from "@/services/edi";
+import { generateEdi } from "@/services/api/edi";
 import { useCargoFormList } from "@/hooks/useCargoFormList";
 import { useClipboard } from "@/hooks/useClipboard";
 import { useFileDownload } from "@/hooks/useFileDownload";
@@ -56,7 +56,7 @@ export default function HomePage() {
 
     try {
       const ediResult = await generateEdi(cargoItems);
-      setEdiOutput(ediResult);
+      setEdiOutput(ediResult.edi);
     } catch (err: any) {
       setError(err.message || "Unknown error");
     } finally {

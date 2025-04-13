@@ -1,6 +1,6 @@
 export type CargoType = 'FCL' | 'LCL' | 'FCX' | '';
 
-export interface CargoFormData {
+export interface ICargoFormData {
   id?: string;
   cargoType?: CargoType;
   packageCount?: number;
@@ -9,7 +9,7 @@ export interface CargoFormData {
   houseBillNumber?: string;  // Optional
 }
 
-export interface CargoValidationErrors {
+export interface ICargoValidationErrors {
   cargoType?: string;
   packageCount?: string;
   containerNumber?: string;
