@@ -10,9 +10,9 @@ export default function HomePage() {
   // Initial cargo items list
   const [cargoItems, setCargoItems] = useState<CargoFormData[]>([
     {
-      container_number: "",
-      master_bill_number: "",
-      house_bill_number: "",
+      containerNumber: "",
+      masterBillNumber: "",
+      houseBillNumber: "",
     },
   ]);
 
@@ -62,9 +62,9 @@ export default function HomePage() {
     setCargoItems((prev) => [
       ...prev,
       {
-        container_number: "",
-        master_bill_number: "",
-        house_bill_number: "",
+        containerNumber: "",
+        masterBillNumber: "",
+        houseBillNumber: "",
       },
     ]);
     setEdiOutput("");
@@ -96,11 +96,11 @@ export default function HomePage() {
 
     cargoItems.forEach((item, index) => {
       const errors = {
-        cargo_type: !item.cargo_type ? "Cargo type is required" : "",
-        package_count: !item.package_count ? "Package count is required" : "",
-        container_number: "",
-        master_bill_number: "",
-        house_bill_number: "",
+        cargoType: !item.cargoType ? "Cargo type is required" : "",
+        packageCount: !item.packageCount ? "Package count is required" : "",
+        containerNumber: "",
+        masterBillNumber: "",
+        houseBillNumber: "",
       };
       
       // Track first error field
@@ -114,31 +114,31 @@ export default function HomePage() {
       }
       
       // Check optional fields format
-      if (item.container_number && !isAlphaNumeric(item.container_number)) {
-        errors.container_number = "Container number can only contain letters and numbers";
+      if (item.containerNumber && !isAlphaNumeric(item.containerNumber)) {
+        errors.containerNumber = "Container number can only contain letters and numbers";
         hasErrors = true;
         if (!firstErrorField) {
-          firstErrorField = { index, field: 'container_number' };
+          firstErrorField = { index, field: 'containerNumber' };
         }
       }
       
-      if (item.master_bill_number && !isAlphaNumeric(item.master_bill_number)) {
-        errors.master_bill_number = "Master bill number can only contain letters and numbers";
+      if (item.masterBillNumber && !isAlphaNumeric(item.masterBillNumber)) {
+        errors.masterBillNumber = "Master bill number can only contain letters and numbers";
         hasErrors = true;
         if (!firstErrorField) {
-          firstErrorField = { index, field: 'master_bill_number' };
+          firstErrorField = { index, field: 'masterBillNumber' };
         }
       }
       
-      if (item.house_bill_number && !isAlphaNumeric(item.house_bill_number)) {
-        errors.house_bill_number = "House bill number can only contain letters and numbers";
+      if (item.houseBillNumber && !isAlphaNumeric(item.houseBillNumber)) {
+        errors.houseBillNumber = "House bill number can only contain letters and numbers";
         hasErrors = true;
         if (!firstErrorField) {
-          firstErrorField = { index, field: 'house_bill_number' };
+          firstErrorField = { index, field: 'houseBillNumber' };
         }
       }
 
-      if (errors.cargo_type || errors.package_count) {
+      if (errors.cargoType || errors.packageCount) {
         hasErrors = true;
       }
 
@@ -184,7 +184,7 @@ export default function HomePage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ cargo_items: cargoItems }),
+        body: JSON.stringify({ cargoItems: cargoItems }),
       });
 
       if (!response.ok) {
@@ -219,11 +219,11 @@ export default function HomePage() {
   const handleClearAll = () => {
     setCargoItems([
       {
-        cargo_type: undefined,
-        package_count: undefined,
-        container_number: "",
-        master_bill_number: "",
-        house_bill_number: "",
+        cargoType: undefined,
+        packageCount: undefined,
+        containerNumber: "",
+        masterBillNumber: "",
+        houseBillNumber: "",
       }
     ]);
     setEdiOutput("");
@@ -232,11 +232,11 @@ export default function HomePage() {
     formRefs.current.forEach(ref => {
       if (ref) {
         ref.setFieldErrors({
-          cargo_type: "",
-          package_count: "",
-          container_number: "",
-          master_bill_number: "",
-          house_bill_number: "",
+          cargoType: "",
+          packageCount: "",
+          containerNumber: "",
+          masterBillNumber: "",
+          houseBillNumber: "",
         });
       }
     });

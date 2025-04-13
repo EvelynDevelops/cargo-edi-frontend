@@ -10,12 +10,14 @@
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.0",
+    "camelcase-keys": "^9.1.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.487.0",
     "next": "15.2.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "snakecase-keys": "^8.0.1",
     "tailwind-merge": "^3.2.0",
     "tw-animate-css": "^1.2.5"
   },

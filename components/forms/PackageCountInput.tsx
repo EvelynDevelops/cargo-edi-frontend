@@ -27,7 +27,7 @@ const PackageCountInput: React.FC<PackageCountInputProps> = ({
       placeholder="Enter number of packages"
       error={error}
       data-form-index={index}
-      data-field="package_count"
+      data-field="packageCount"
       onKeyDown={(e) => {
         if (e.key === '.') {
           e.preventDefault();

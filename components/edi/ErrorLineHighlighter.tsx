@@ -21,9 +21,10 @@ const ErrorLineHighlighter: React.FC<ErrorLineHighlighterProps> = ({
 
     return errorLines.map(lineNum => {
       if (lineNum >= lines.length) return null;
-      
+      const lineHeight = 21;
+      const topPadding = 12; 
       // Calculate position considering textarea padding
-      const topPosition = lineNum * 21 + 12; // Line height 21px, top padding 12px
+      const topPosition = lineNum * lineHeight + topPadding; 
 
       return {
         top: `${topPosition}px`,

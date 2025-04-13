@@ -30,7 +30,7 @@ const CopyButton: React.FC<Props> = ({ onCopy, className = "" }) => {
         textArea.focus();
         textArea.select();
         try {
-          document.execCommand('copy');  // Fallback approach for clipboard copy
+          await navigator.clipboard.writeText(textToCopy);
           setIsCopied(true);             // Show "copied" status
           setTimeout(() => setIsCopied(false), 2000);  // Reset after 2 seconds
           onCopy();                      // Trigger any callback passed by parent

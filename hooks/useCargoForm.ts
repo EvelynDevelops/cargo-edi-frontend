@@ -11,63 +11,34 @@ interface UseCargoFormProps {
 
 export const useCargoForm = ({ index, data, onChange, onValidate }: UseCargoFormProps) => {
   const [errors, setErrors] = useState<CargoFormErrors>({
-    cargo_type: "",
-    package_count: "",
-    container_number: "",
-    master_bill_number: "",
-    house_bill_number: ""
+    cargoType: "",
+    packageCount: "",
+    containerNumber: "",
+    masterBillNumber: "",
+    houseBillNumber: ""
   });
 
-  // 当错误变化时，触发验证报告给父组件
+  // Report validation status to parent component when errors change
   useEffect(() => {
     if (onValidate) {
-      const isValid = Object.values(errors).every((e) => e === "");
+      const isValid = Object.values(errors).every(error => !error);
       onValidate(index, isValid);
     }
   }, [errors, index, onValidate]);
 
-  const handleFieldChange = (field: keyof CargoFormData, value: string | number) => {
-    const updated = { ...data };
-    const newErrors = { ...errors };
-    
-    if (field === "package_count") {
-      const numValue = value === "" ? undefined : Number(value);
-      updated[field] = numValue;
-      
-      // 使用验证模块验证字段
-      newErrors[field] = validateField(field, value, data);
-    } else if (field !== "cargo_type" && typeof value === "string") {
-      // always update the value, even if it is invalid
-      if (value === "" || value.trim() === "") {
-        (updated as any)[field] = undefined;
-      } else {
-        (updated as any)[field] = value;
-      }
-      
-      // 使用验证模块验证字段
-      newErrors[field] = validateField(field, value, data);
-    } else if (field === "cargo_type") {
-      const newValue = value === "" ? undefined : value as CargoType;
-      updated.cargo_type = newValue;
-      
-      // 使用验证模块验证字段
-      newErrors[field] = validateField(field, value, data);
-    }
+  const handleFieldChange = (field: keyof CargoFormData, value: any) => {
+    const updatedData = { ...data, [field]: value };
+    onChange(index, updatedData);
 
-    setErrors(newErrors);
-    onChange(index, updated);
+    // Validate the field
+    const error = validateField(field, value, updatedData);
+    setErrors(prev => ({ ...prev, [field]: error }));
   };
 
   const handleBlur = (field: keyof CargoFormData, value: any) => {
-    const newErrors = { ...errors };
-    
-    if (field === "package_count") {
-      newErrors[field] = validateField(field, value, data);
-    } else if (field === "cargo_type") {
-      newErrors[field] = validateField(field, value, data);
-    }
-    
-    setErrors(newErrors);
+    // Validate the field on blur
+    const error = validateField(field, value, data);
+    setErrors(prev => ({ ...prev, [field]: error }));
   };
 
   const setFieldErrors = (newErrors: CargoFormErrors) => {

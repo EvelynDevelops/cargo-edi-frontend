@@ -25,7 +25,7 @@ const CargoTypeSelect: React.FC<CargoTypeSelectProps> = ({
         onChange={(e) => onChange(e.target.value as CargoType)}
         onBlur={(e) => onBlur(e.target.value)}
         data-form-index={index}
-        data-field="cargo_type"
+        data-field="cargoType"
       >
         <option value="" disabled className="text-gray-500">Select cargo type</option>
         <option value="FCX" className="text-gray-900">FCX</option>

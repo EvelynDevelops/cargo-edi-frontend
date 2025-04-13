@@ -4,7 +4,6 @@ import CargoCard from '@/components/CargoCard';
 import { Button } from "@/components/ui/Button";
 
 /**
- * Props for the ConfirmationModal component
  * @property {boolean} isOpen - Whether the modal is open
  * @property {Function} onClose - Callback function to close the modal
  * @property {Function} onConfirm - Callback function to handle confirmation
@@ -17,21 +16,14 @@ interface ConfirmationModalProps {
   cargoItems: CargoFormData[];
 }
 
-/**
- * ConfirmationModal component displays a modal for reviewing cargo information
- * before generating EDI messages. It shows a summary of cargo items and
- * allows users to confirm or go back to edit.
- */
+
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   isOpen,
   onClose,
   onConfirm,
   cargoItems,
 }) => {
-  /**
-   * Handle confirm button click - passes cargo items to onConfirm callback
-   * and closes the modal
-   */
+
   const handleConfirm = () => {
     // Pass cargo items to onConfirm callback
     onConfirm(cargoItems);
@@ -43,7 +35,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
   // Calculate total number of packages across all cargo items
   const totalPackages = cargoItems.reduce(
-    (sum, item) => sum + item.package_count,
+    (sum, item) => sum + (item.packageCount || 0),
     0
   );
 
@@ -53,9 +45,9 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     let segments = 3;
     
     // Additional segments for optional fields
-    if (item.container_number) segments += 2;
-    if (item.master_bill_number) segments += 2;
-    if (item.house_bill_number) segments += 2;
+    if (item.containerNumber) segments += 2;
+    if (item.masterBillNumber) segments += 2;
+    if (item.houseBillNumber) segments += 2;
     
     return total + segments;
   }, 0);

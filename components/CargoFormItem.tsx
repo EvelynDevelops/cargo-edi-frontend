@@ -11,19 +11,19 @@ export type CargoType = "FCX" | "LCL" | "FCL";
 
 export interface CargoFormData {
   id?: string;
-  cargo_type?: CargoType;
-  package_count?: number;
-  container_number?: string;
-  master_bill_number?: string;
-  house_bill_number?: string;
+  cargoType?: CargoType;
+  packageCount?: number;
+  containerNumber?: string;
+  masterBillNumber?: string;
+  houseBillNumber?: string;
 }
 
 export interface CargoFormErrors {
-  cargo_type: string;
-  package_count: string;
-  container_number: string;
-  master_bill_number: string;
-  house_bill_number: string;
+  cargoType: string;
+  packageCount: string;
+  containerNumber: string;
+  masterBillNumber: string;
+  houseBillNumber: string;
 }
 
 interface Props {
@@ -63,56 +63,56 @@ const CargoFormItem = forwardRef<CargoFormRef, Props>(({
       <div className="flex flex-col gap-4">
         {/* Cargo Type */}
         <CargoTypeSelect
-          value={data.cargo_type}
-          onChange={(value) => handleFieldChange("cargo_type", value)}
-          onBlur={(value) => handleBlur("cargo_type", value)}
-          error={errors.cargo_type}
+          value={data.cargoType}
+          onChange={(value) => handleFieldChange("cargoType", value)}
+          onBlur={(value) => handleBlur("cargoType", value)}
+          error={errors.cargoType}
           index={index}
         />
 
         {/* Number of Packages */}
         <PackageCountInput
-          value={data.package_count}
-          onChange={(value) => handleFieldChange("package_count", value)}
-          onBlur={(value) => handleBlur("package_count", value)}
-          error={errors.package_count}
+          value={data.packageCount}
+          onChange={(value) => handleFieldChange("packageCount", value)}
+          onBlur={(value) => handleBlur("packageCount", value)}
+          error={errors.packageCount}
           index={index}
         />
 
         {/* Container Number */}
         <TextInput
           label="Container Number (Optional)"
-          value={data.container_number ?? ""}
-          onChange={(e) => handleFieldChange("container_number", e.target.value)}
-          onBlur={(e) => handleBlur("container_number", e.target.value)}
+          value={data.containerNumber ?? ""}
+          onChange={(e) => handleFieldChange("containerNumber", e.target.value)}
+          onBlur={(e) => handleBlur("containerNumber", e.target.value)}
           placeholder="Enter container number (optional)"
-          error={errors.container_number}
+          error={errors.containerNumber}
           data-form-index={index}
-          data-field="container_number"
+          data-field="containerNumber"
         />
 
         {/* Master Bill */}
         <TextInput
           label="Master Bill Number (Optional)"
-          value={data.master_bill_number ?? ""}
-          onChange={(e) => handleFieldChange("master_bill_number", e.target.value)}
-          onBlur={(e) => handleBlur("master_bill_number", e.target.value)}
+          value={data.masterBillNumber ?? ""}
+          onChange={(e) => handleFieldChange("masterBillNumber", e.target.value)}
+          onBlur={(e) => handleBlur("masterBillNumber", e.target.value)}
           placeholder="Enter master bill number (optional)"
-          error={errors.master_bill_number}
+          error={errors.masterBillNumber}
           data-form-index={index}
-          data-field="master_bill_number"
+          data-field="masterBillNumber"
         />
 
         {/* House Bill */}
         <TextInput
           label="House Bill Number (Optional)"
-          value={data.house_bill_number ?? ""}
-          onChange={(e) => handleFieldChange("house_bill_number", e.target.value)}
-          onBlur={(e) => handleBlur("house_bill_number", e.target.value)}
+          value={data.houseBillNumber ?? ""}
+          onChange={(e) => handleFieldChange("houseBillNumber", e.target.value)}
+          onBlur={(e) => handleBlur("houseBillNumber", e.target.value)}
           placeholder="Enter house bill number (optional)"
-          error={errors.house_bill_number}
+          error={errors.houseBillNumber}
           data-form-index={index}
-          data-field="house_bill_number"
+          data-field="houseBillNumber"
         />
       </div>
     </div>

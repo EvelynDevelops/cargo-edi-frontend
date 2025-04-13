@@ -11,15 +11,19 @@ interface ValidationRules {
 
 // 定义验证规则
 const validationRules: ValidationRules = {
-  cargo_type: [
+  cargoType: [
     {
-      validate: (value) => !!value,
+      validate: (value) => value !== undefined && value !== "",
       message: "Cargo type is required"
+    },
+    {
+      validate: (value) => isValidCargoType(value),
+      message: "Invalid cargo type"
     }
   ],
-  package_count: [
+  packageCount: [
     {
-      validate: (value) => !!value,
+      validate: (value) => value !== undefined && value !== "",
       message: "Number of packages is required"
     },
     {
@@ -27,40 +31,22 @@ const validationRules: ValidationRules = {
       message: "Number of packages must be a positive number"
     }
   ],
-  container_number: [
+  containerNumber: [
     {
-      validate: (value, data) => {
-        if (!value) return true; // 可选字段
-        if (data.cargo_type === "FCL") {
-          return /^[A-Z]{4}\d{7}$/.test(value);
-        }
-        return true;
-      },
-      message: "Container number must be in format AAAA1234567 for FCL cargo"
+      validate: (value) => value === undefined || value === "" || /^[A-Z0-9]{7,11}$/.test(value),
+      message: "Container number must be 7-11 characters long and contain only uppercase letters and numbers"
     }
   ],
-  master_bill_number: [
+  masterBillNumber: [
     {
-      validate: (value, data) => {
-        if (!value) return true; // 可选字段
-        if (data.cargo_type === "LCL") {
-          return /^[A-Z]{3}\d{6}$/.test(value);
-        }
-        return true;
-      },
-      message: "Master bill number must be in format AAA123456 for LCL cargo"
+      validate: (value) => value === undefined || value === "" || /^[A-Z0-9]{5,20}$/.test(value),
+      message: "Master bill number must be 5-20 characters long and contain only uppercase letters and numbers"
     }
   ],
-  house_bill_number: [
+  houseBillNumber: [
     {
-      validate: (value, data) => {
-        if (!value) return true; // 可选字段
-        if (data.cargo_type === "LCL") {
-          return /^[A-Z]{2}\d{5}$/.test(value);
-        }
-        return true;
-      },
-      message: "House bill number must be in format AA12345 for LCL cargo"
+      validate: (value) => value === undefined || value === "" || /^[A-Z0-9]{5,20}$/.test(value),
+      message: "House bill number must be 5-20 characters long and contain only uppercase letters and numbers"
     }
   ]
 };
