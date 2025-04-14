@@ -12,11 +12,9 @@ A web application for generating and decoding EDI (Electronic Data Interchange) 
    ```
 
 2. Configure environment variables:
-   ```bash
-   # Copy the sample environment file
-   cp .env.sample .env
-   ```
-   The `.env.sample` file contains example configurations:
+   
+   Create a new `.env` file and copy the contents from the `.env.sample` file into it.
+   The `.env.sample` file contains example configurations that you can modify according to your needs.
 
 3. Run the development server:
    ```bash
@@ -31,19 +29,6 @@ A web application for generating and decoding EDI (Electronic Data Interchange) 
 - Node.js 18.x or later
 - npm 9.x or later (or pnpm)
 
-## Project Structure
-
-```
-cargo-edi-frontend/
-├── app/             # Next.js pages and routing
-│   ├── forms/      # Form-related components
-│   ├── shared/     # Shared UI components
-│   └── edi/        # EDI-specific components
-├── hooks/           # Custom React hooks
-├── services/        # API services
-├── types/           # TypeScript type definitions
-└── utils/          # Utility functions
-```
 
 ## Key Dependencies
 
@@ -55,26 +40,7 @@ cargo-edi-frontend/
 - Jest & React Testing Library - Testing
 
 
-## Features
-
-- Generate EDI messages from cargo information
-- Decode existing EDI messages to human-readable format
-- Download EDI messages as files
-- Copy EDI content to clipboard
-- Real-time validation
-- Support for multiple cargo items
-- Responsive design for mobile and desktop
-
-
 ## Development
-
-### Running Tests
-```bash
-npm test
-# or
-pnpm test
-```
-
 
 ## Production Build
 
