@@ -58,12 +58,13 @@ npm start
 - Add end-to-end tests for critical user flows
 
 ### Features
-- Add support for more EDI message types
-- Add history of generated/decoded EDI messages
+- Implement form state persistence to prevent data loss on page refresh
+- Add ability to save and load form templates
 
 ### UI/UX
-- Add loading indicators for API calls
-- Implement better error handling UI
+- Add form state recovery after accidental page refresh
+- Implement auto-save functionality for form data
 
 ### Code Quality
 - Extract common form logic into reusable hooks
+- Implement form state management with local storage or session storage
