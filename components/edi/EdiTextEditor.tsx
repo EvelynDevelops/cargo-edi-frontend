@@ -1,6 +1,6 @@
 "use client";
 
-import React, { forwardRef, useImperativeHandle, useState } from "react";
+import React, { forwardRef, useImperativeHandle, useState, useEffect } from "react";
 import ErrorPanel from "./ErrorPanel";
 import EdiTextArea from "./EdiTextArea";
 import { useEdiEditor } from "@/hooks/useEdiEditor";
@@ -45,7 +45,8 @@ const EdiTextEditor = forwardRef<IEdiTextEditorRef, IEdiTextEditorProps>(functio
     handleDecode,
     handleClear,
     getInput,
-    setManualErrorLine
+    setManualErrorLine,
+    findEmptyLines
   } = useEdiEditor({
     onDecode,
     onInputChange,
@@ -54,11 +55,28 @@ const EdiTextEditor = forwardRef<IEdiTextEditorRef, IEdiTextEditorProps>(functio
   });
 
   // Handler for when an error line is detected from log message
-  const handleErrorLineDetected = (lineNumber: number) => {
-    // Convert from 1-based to 0-based index
-    setDetectedErrorLine(lineNumber - 1);
-    // Set the error line in the editor
-    setManualErrorLine(lineNumber - 1);
+  const handleErrorLineDetected = (lineNumber: number, isEmptyLine?: boolean) => {
+    if (lineNumber > 0) {
+      // Convert from 1-based to 0-based index
+      const zeroBasedLineNumber = lineNumber - 1;
+      setDetectedErrorLine(zeroBasedLineNumber);
+      // Set the error line in the editor
+      setManualErrorLine(zeroBasedLineNumber);
+    } else if (isEmptyLine) {
+      // If we know it's an empty line error but don't know the line number,
+      // find all empty lines in the input
+      const emptyLines = findEmptyLines();
+      if (emptyLines.length > 0) {
+        // Highlight all empty lines
+        emptyLines.forEach(lineNum => {
+          setManualErrorLine(lineNum);
+        });
+        // For status tracking, set the first empty line as the detected error line
+        if (emptyLines.length > 0) {
+          setDetectedErrorLine(emptyLines[0]);
+        }
+      }
+    }
   };
 
   // Expose methods to parent component

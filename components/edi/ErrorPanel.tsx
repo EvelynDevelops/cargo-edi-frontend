@@ -6,7 +6,7 @@ import { processLogMessage, parseEdiFormatError } from "../../utils/errorProcess
 interface IErrorPanelProps {
   error: string;
   logs?: string[];
-  onErrorLineDetected?: (lineNumber: number) => void;
+  onErrorLineDetected?: (lineNumber: number, isEmptyLine?: boolean) => void;
 }
 
 /**
@@ -33,7 +33,14 @@ const ErrorPanel: React.FC<IErrorPanelProps> = ({
   // Notify parent component about error line if available
   useEffect(() => {
     if (processedLogData?.lineNumber && onErrorLineDetected) {
-      onErrorLineDetected(processedLogData.lineNumber);
+      onErrorLineDetected(
+        processedLogData.lineNumber, 
+        processedLogData.isEmptyLine
+      );
+    } else if (processedLogData?.isEmptyLine && !processedLogData.lineNumber && onErrorLineDetected) {
+      // If we know it's an empty line error but don't know which line,
+      // let the parent component try to find empty lines
+      onErrorLineDetected(-1, true);
     }
   }, [processedLogData, onErrorLineDetected]);
 

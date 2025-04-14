@@ -17,6 +17,7 @@ interface IUseEdiEditorResult {
   handleClear: () => void;
   getInput: () => string;
   setManualErrorLine: (lineNumber: number) => void;
+  findEmptyLines: () => number[];
 }
 
 /**
@@ -190,6 +191,18 @@ export const useEdiEditor = ({
     setManualErrorLine(lineNumber);
   }, []);
 
+  // Find all empty lines in the input
+  const findEmptyLines = useCallback((): number[] => {
+    const emptyLineIndices: number[] = [];
+    lines.forEach((line, index) => {
+      // Consider both completely empty lines and lines with only whitespace
+      if (line.trim() === '') {
+        emptyLineIndices.push(index);
+      }
+    });
+    return emptyLineIndices;
+  }, [lines]);
+
   return {
     input,
     errorLines,
@@ -199,6 +212,7 @@ export const useEdiEditor = ({
     handleDecode,
     handleClear,
     getInput,
-    setManualErrorLine: setLineError
+    setManualErrorLine: setLineError,
+    findEmptyLines
   };
 }; 

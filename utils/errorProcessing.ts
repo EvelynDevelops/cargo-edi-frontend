@@ -4,6 +4,7 @@
 export interface IProcessedLogMessage {
   message: string;   // The processed error message
   lineNumber?: number; // The line number where the error occurred, if available
+  isEmptyLine?: boolean; // Flag indicating if the error is related to an empty line
 }
 
 /**
@@ -13,6 +14,11 @@ export interface IProcessedLogMessage {
  */
 export const processLogMessage = (log: string): IProcessedLogMessage => {
   if (!log) return { message: '' };
+  
+  // Check if error is related to empty line
+  const isEmptyLine = log.toLowerCase().includes('empty line') || 
+                     log.toLowerCase().includes('blank line') ||
+                     log.toLowerCase().includes('no content in line');
   
   // Extract line number if available
   let lineNumber: number | undefined = undefined;
@@ -27,7 +33,8 @@ export const processLogMessage = (log: string): IProcessedLogMessage => {
     // Remove trailing brackets and quotes
     return { 
       message: match[1].trim().replace(/[\]']+\s*$/, ''),
-      lineNumber
+      lineNumber,
+      isEmptyLine
     };
   }
   
@@ -44,12 +51,14 @@ export const processLogMessage = (log: string): IProcessedLogMessage => {
       }
       return { 
         message: innerMatch[1].trim().replace(/[\]']+\s*$/, ''),
-        lineNumber
+        lineNumber,
+        isEmptyLine
       };
     }
     return { 
       message: match[1].trim().replace(/[\]']+\s*$/, ''),
-      lineNumber
+      lineNumber,
+      isEmptyLine
     };
   }
   
@@ -76,18 +85,21 @@ export const processLogMessage = (log: string): IProcessedLogMessage => {
       if (innerContentMatch && innerContentMatch[1]) {
         return { 
           message: innerContentMatch[1].trim().replace(/[\]']+\s*$/, ''),
-          lineNumber
+          lineNumber,
+          isEmptyLine
         };
       }
       return { 
         message: arrayMatch[1].trim().replace(/[\]']+\s*$/, ''),
-        lineNumber
+        lineNumber,
+        isEmptyLine
       };
     }
     
     return { 
       message: errorMsg.replace(/[\]']+\s*$/, ''),
-      lineNumber
+      lineNumber,
+      isEmptyLine
     };
   }
   
@@ -104,13 +116,33 @@ export const processLogMessage = (log: string): IProcessedLogMessage => {
     if (lineError && lineError[1]) {
       return { 
         message: lineError[1].trim(),
-        lineNumber
+        lineNumber,
+        isEmptyLine
       };
     }
     return { 
       message: arrayError[1].trim(),
-      lineNumber
+      lineNumber,
+      isEmptyLine
     };
+  }
+  
+  // Special handling for empty line errors without line numbers
+  if (isEmptyLine && !lineNumber) {
+    // Try to extract line number from more specific patterns
+    const emptyLineMatches = [
+      log.match(/empty line (\d+)/i),
+      log.match(/line (\d+) is empty/i),
+      log.match(/blank line (\d+)/i),
+      log.match(/line (\d+) is blank/i)
+    ];
+    
+    for (const emptyMatch of emptyLineMatches) {
+      if (emptyMatch && emptyMatch[1]) {
+        lineNumber = parseInt(emptyMatch[1], 10);
+        break;
+      }
+    }
   }
   
   // If all previous matches fail, process the original log
@@ -152,7 +184,8 @@ export const processLogMessage = (log: string): IProcessedLogMessage => {
   
   return { 
     message: result,
-    lineNumber
+    lineNumber,
+    isEmptyLine
   };
 };
 
