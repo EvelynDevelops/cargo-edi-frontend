@@ -14,7 +14,14 @@ export default function DecodePage() {
   const { downloadJson } = useFileDownload();
 
   const handleDownloadJson = () => {
-    downloadJson(decoded, `decoded_edi_${Date.now()}.json`);
+    const now = new Date();
+    const date = now.toISOString().split('T')[0];
+    const time = now.toTimeString().split(' ')[0].replace(/:/g, '-');
+    const itemCount = decoded.length;
+    
+    const filename = `decoded_${date}_${time}_${itemCount}items.json`;
+    
+    downloadJson(decoded, filename);
   };
 
   const handleClearAll = () => {

@@ -38,9 +38,19 @@ export default function HomePage() {
 
   // Download EDI result as .edi file
   const handleDownload = () => {
+    // Create more descriptive filename with date, time and cargo info
+    const now = new Date();
+    const date = now.toISOString().split('T')[0]; // YYYY-MM-DD
+    const time = now.toTimeString().split(' ')[0].replace(/:/g, '-'); // HH-MM-SS
+    const cargoCount = cargoItems.length;
+    const cargoTypes = [...new Set(cargoItems.map(item => item.cargoType))].filter(Boolean).join('_');
+    
+    // Generate filename with pattern: cargo_YYYY-MM-DD_HH-MM-SS_COUNT_TYPES.edi
+    const filename = `cargo_${date}_${time}_${cargoCount}${cargoTypes ? `_${cargoTypes}` : ''}.edi`;
+    
     downloadFile(ediOutput, {
       type: "text/plain;charset=utf-8",
-      filename: "cargo_message.edi"
+      filename
     });
   };
 
