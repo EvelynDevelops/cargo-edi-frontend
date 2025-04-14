@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 
 interface IErrorPanelProps {
   error: string;
+  logs?: string[];
 }
 
 /**
@@ -98,10 +99,13 @@ const parseEdiFormatError = (error: string): string[] => {
 /**
  * Error Panel Component
  */
-const ErrorPanel: React.FC<IErrorPanelProps> = ({ error }) => {
+const ErrorPanel: React.FC<IErrorPanelProps> = ({ error, logs = [] }) => {
+  const [showLogs, setShowLogs] = useState(false);
+  
   if (!error) return null;
 
   const errorMessages = parseEdiFormatError(error);
+  const hasLogs = logs && logs.length > 0;
 
   return (
     <div className="bg-red-50 border border-red-200 rounded-md p-3">
@@ -113,6 +117,37 @@ const ErrorPanel: React.FC<IErrorPanelProps> = ({ error }) => {
           {message}
         </div>
       ))}
+      
+      {/* 显示日志部分 */}
+      {hasLogs && (
+        <div className="mt-3 border-t border-red-200 pt-2">
+          <button 
+            onClick={() => setShowLogs(!showLogs)}
+            className="text-xs text-red-600 hover:text-red-800 flex items-center"
+          >
+            {showLogs ? '隐藏后端日志' : '显示后端日志'}
+            <svg 
+              className={`ml-1 w-4 h-4 transition-transform ${showLogs ? 'rotate-180' : ''}`} 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          
+          {showLogs && (
+            <div className="mt-2 text-xs bg-gray-100 p-2 rounded max-h-48 overflow-y-auto font-mono">
+              {logs.map((log, index) => (
+                <div key={index} className="text-gray-800 mb-1 last:mb-0">
+                  {log}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

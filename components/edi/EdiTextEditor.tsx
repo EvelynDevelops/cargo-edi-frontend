@@ -11,6 +11,7 @@ interface IEdiTextEditorProps {
   onInputChange?: () => void;
   loading?: boolean;
   error?: string;
+  errorLogs?: string[];
   setError?: (error: string) => void;
 }
 
@@ -29,6 +30,7 @@ const EdiTextEditor = forwardRef<IEdiTextEditorRef, IEdiTextEditorProps>(functio
   onInputChange,
   loading = false,
   error = "",
+  errorLogs = [],
   setError
 }, ref) {
   const {
@@ -63,7 +65,7 @@ const EdiTextEditor = forwardRef<IEdiTextEditorRef, IEdiTextEditorProps>(functio
         errorLines={errorLines}
         lines={lines}
       />
-      <ErrorPanel error={error} />
+      <ErrorPanel error={error} logs={errorLogs} />
     </div>
   );
 });

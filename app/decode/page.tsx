@@ -9,7 +9,7 @@ import { useFileDownload } from "@/hooks/useFileDownload";
 
 export default function DecodePage() {
   const decoderRef = useRef<{ handleDecode: () => void; handleClear: () => void; getInput: () => string }>(null);
-  const { decoded, loading, error, handleDecode, setError, clearDecoded } = useEdiDecoder();
+  const { decoded, loading, error, errorLogs, handleDecode, setError, clearDecoded } = useEdiDecoder();
   const { copyToClipboard } = useClipboard(setError);
   const { downloadJson } = useFileDownload();
 
@@ -48,6 +48,7 @@ export default function DecodePage() {
         onInputChange={clearDecoded}
         loading={loading}
         error={error}
+        errorLogs={errorLogs}
         setError={setError}
       />
     </DecoderLayout>
