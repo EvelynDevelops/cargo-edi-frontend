@@ -8,6 +8,12 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Cargo EDI Generator",
   description: "Generate EDI messages for cargo shipments",
+  icons: {
+    icon: [
+      { url: '/images/clear-logo.png', sizes: 'any' },
+    ],
+    apple: { url: '/images/clear-logo.png', sizes: 'any' }
+  },
 };
 
 export default function RootLayout({
