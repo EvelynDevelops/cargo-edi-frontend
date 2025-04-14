@@ -141,8 +141,46 @@ export const useCargoFormList = () => {
     if (firstErrorField) {
       const element = document.querySelector(`[data-form-index="${firstErrorField.index}"][data-field="${firstErrorField.field}"]`);
       if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        (element as HTMLElement).focus();
+        // 使用更可靠的平滑滚动实现
+        const scrollToElement = () => {
+          try {
+            // 获取元素位置
+            const rect = element.getBoundingClientRect();
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            // 计算目标位置，留出适当空间
+            const headerHeight = 80; // 顶部导航/标题的估计高度
+            const targetY = rect.top + scrollTop - headerHeight - 20; // 额外的20px作为上边距
+            
+            // 使用平滑滚动
+            window.scrollTo({
+              top: targetY,
+              behavior: 'smooth'
+            });
+            
+            // 延迟设置焦点，让滚动有时间完成
+            setTimeout(() => {
+              (element as HTMLElement).focus();
+              
+              // 为错误元素添加临时高亮效果
+              element.classList.add('highlight-error');
+              setTimeout(() => {
+                element.classList.remove('highlight-error');
+              }, 1500);
+            }, 500);
+          } catch (err) {
+            // 后备方案：使用原生scrollIntoView
+            console.error('Error during smooth scroll:', err);
+            element.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center' 
+            });
+            setTimeout(() => (element as HTMLElement).focus(), 300);
+          }
+        };
+        
+        // 确保在下一帧执行滚动，避免布局问题
+        requestAnimationFrame(scrollToElement);
       }
     }
 
