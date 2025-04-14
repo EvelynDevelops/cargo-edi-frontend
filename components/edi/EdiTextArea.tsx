@@ -27,7 +27,7 @@ const EdiTextArea: React.FC<IEdiTextAreaProps> = ({
         ref={textareaRef}
         value={value}
         className={cn(
-          "w-full min-h-135 border border-input rounded-md shadow-sm",
+          "w-full min-h-116 border border-input rounded-md shadow-sm",
           "p-3 text-sm font-mono resize-none overflow-auto",
           "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
           "placeholder:text-muted-foreground",
