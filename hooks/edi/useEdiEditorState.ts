@@ -21,11 +21,6 @@ export function useEdiEditorState({
   const [lines, setLines] = useState<string[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Update lines when input changes
-  const updateLines = useCallback(() => {
-    setLines(input.split('\n'));
-  }, [input]);
-  
   // Input change handler
   const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
@@ -39,6 +34,11 @@ export function useEdiEditorState({
     if (onInputChange) onInputChange();
   }, [error, onInputChange, setError]);
 
+  // Update lines array
+  const updateLines = useCallback(() => {
+    setLines(input.split('\n'));
+  }, [input]);
+
   // Decode handler
   const handleDecode = useCallback(() => {
     if (setError) setError("");
@@ -51,7 +51,7 @@ export function useEdiEditorState({
     if (setError) setError("");
   }, [setError]);
 
-  // Get input value (used by parent components)
+  // Get input value
   const getInput = useCallback(() => input, [input]);
 
   // Find all empty lines in the input
