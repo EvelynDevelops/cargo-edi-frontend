@@ -54,25 +54,25 @@ const ConfirmationModal: React.FC<IConfirmationModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 sm:p-6 transition-opacity duration-300"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-xl w-[90vw] h-[90vh] flex flex-col overflow-hidden"
+        className="bg-white rounded-xl w-full max-w-[90vw] h-[90vh] flex flex-col overflow-hidden transform transition-all duration-300 ease-in-out"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal header */}
-        <div className="p-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800">Confirm Cargo Information</h2>
-          <p className="text-gray-600 mt-1">Please review the cargo information before generating EDI.</p>
+        <div className="p-4 sm:p-6 border-b border-gray-200">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-800">Confirm Cargo Information</h2>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Please review the cargo information before generating EDI.</p>
         </div>
 
         {/* Modal content */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
           {/* Cargo summary section */}
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Cargo Items Summary:</h3>
-            <div className="text-m text-gray-600">
+          <div className="mb-4 sm:mb-6">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2">Cargo Items Summary:</h3>
+            <div className="text-sm sm:text-base text-gray-600">
               <ul className="list-disc pl-5 space-y-1">
                 <li>Number of cargo items: <strong>{cargoItems.length}</strong></li>
                 <li>Total number of packages: <strong>{totalPackages}</strong></li>
@@ -82,7 +82,7 @@ const ConfirmationModal: React.FC<IConfirmationModalProps> = ({
           </div>
 
           {/* Grid of cargo cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {cargoItems.map((item, index) => (
               <CargoCard
                 key={index}
@@ -95,11 +95,12 @@ const ConfirmationModal: React.FC<IConfirmationModalProps> = ({
         </div>
 
         {/* Modal footer with action buttons */}
-        <div className="p-6 border-t border-gray-200 flex justify-end space-x-3">
+        <div className="p-4 sm:p-6 border-t border-gray-200 flex flex-col sm:flex-row justify-end gap-3">
           <Button
             variant="outline"
             onClick={onClose}
             type="button"
+            className="w-full sm:w-auto"
           >
             Back to Edit
           </Button>
@@ -107,6 +108,7 @@ const ConfirmationModal: React.FC<IConfirmationModalProps> = ({
             variant="default"
             onClick={handleConfirm}
             type="button"
+            className="w-full sm:w-auto"
           >
             Confirm & Generate EDI
           </Button>
