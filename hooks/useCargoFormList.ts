@@ -141,35 +141,35 @@ export const useCargoFormList = () => {
     if (firstErrorField) {
       const element = document.querySelector(`[data-form-index="${firstErrorField.index}"][data-field="${firstErrorField.field}"]`);
       if (element) {
-        // 使用更可靠的平滑滚动实现
+        // Implement more reliable smooth scrolling
         const scrollToElement = () => {
           try {
-            // 获取元素位置
+            // Get element position
             const rect = element.getBoundingClientRect();
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
             
-            // 计算目标位置，留出适当空间
-            const headerHeight = 80; // 顶部导航/标题的估计高度
-            const targetY = rect.top + scrollTop - headerHeight - 20; // 额外的20px作为上边距
+            // Calculate target position with appropriate spacing
+            const headerHeight = 80; // Estimated height of top navigation/header
+            const targetY = rect.top + scrollTop - headerHeight - 20; // Additional 20px as top margin
             
-            // 使用平滑滚动
+            // Use smooth scrolling
             window.scrollTo({
               top: targetY,
               behavior: 'smooth'
             });
             
-            // 延迟设置焦点，让滚动有时间完成
+            // Delay focus to allow scrolling to complete
             setTimeout(() => {
               (element as HTMLElement).focus();
               
-              // 为错误元素添加临时高亮效果
+              // Add temporary highlight effect to error element
               element.classList.add('highlight-error');
               setTimeout(() => {
                 element.classList.remove('highlight-error');
               }, 1500);
             }, 500);
           } catch (err) {
-            // 后备方案：使用原生scrollIntoView
+            // Fallback: use native scrollIntoView
             console.error('Error during smooth scroll:', err);
             element.scrollIntoView({ 
               behavior: 'smooth', 
@@ -179,7 +179,7 @@ export const useCargoFormList = () => {
           }
         };
         
-        // 确保在下一帧执行滚动，避免布局问题
+        // Ensure scrolling executes in the next frame to avoid layout issues
         requestAnimationFrame(scrollToElement);
       }
     }
