@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CargoFormItem from "@/components/forms/CargoFormItem";
 import ConfirmationModal from "@/components/modals/ConfirmationModal";
 import { generateEdi } from "@/services/api/edi";
@@ -17,7 +17,7 @@ export default function HomePage() {
     handleChange,
     handleAdd,
     handleDelete,
-    handleClearAll,
+    handleClearAll: clearAllForms,
     validateAllInputs,
     registerFormRef,
   } = useCargoFormList();
@@ -31,12 +31,24 @@ export default function HomePage() {
   const { copyToClipboard } = useClipboard(setError);
   const { downloadFile } = useFileDownload();
 
+  // Clear ediOutput when form data changes
+  useEffect(() => {
+    setEdiOutput("");
+  }, [cargoItems]);
+
   // Download EDI result as .edi file
   const handleDownload = () => {
     downloadFile(ediOutput, {
       type: "text/plain;charset=utf-8",
       filename: "cargo_message.edi"
     });
+  };
+
+  // Custom clear all handler that also clears output
+  const handleClearAll = () => {
+    clearAllForms();
+    setEdiOutput("");
+    setError("");
   };
 
   // Copy EDI output to clipboard
