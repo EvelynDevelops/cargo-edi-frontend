@@ -1,15 +1,34 @@
 /**
+ * Interface for processed error log message
+ */
+export interface IProcessedLogMessage {
+  message: string;   // The processed error message
+  lineNumber?: number; // The line number where the error occurred, if available
+}
+
+/**
  * Process log message by extracting the actual error content
  * Removes timestamps, prefixes, and unnecessary formatting
+ * Returns both the processed message and line number
  */
-export const processLogMessage = (log: string): string => {
-  if (!log) return '';
+export const processLogMessage = (log: string): IProcessedLogMessage => {
+  if (!log) return { message: '' };
+  
+  // Extract line number if available
+  let lineNumber: number | undefined = undefined;
+  const lineMatch = log.match(/Line (\d+):/i);
+  if (lineMatch && lineMatch[1]) {
+    lineNumber = parseInt(lineMatch[1], 10);
+  }
   
   // First try to match line-specific error content
   let match = log.match(/Line \d+: (.+)$/);
   if (match && match[1]) {
     // Remove trailing brackets and quotes
-    return match[1].trim().replace(/[\]']+\s*$/, '');
+    return { 
+      message: match[1].trim().replace(/[\]']+\s*$/, ''),
+      lineNumber
+    };
   }
   
   // Try to match error content in brackets
@@ -18,9 +37,20 @@ export const processLogMessage = (log: string): string => {
     // Try to extract more specific error from bracket content
     const innerMatch = match[1].match(/Line \d+: (.+)$/);
     if (innerMatch && innerMatch[1]) {
-      return innerMatch[1].trim().replace(/[\]']+\s*$/, '');
+      // Check if we have a line number in the inner match
+      const innerLineMatch = match[1].match(/Line (\d+):/i);
+      if (innerLineMatch && innerLineMatch[1]) {
+        lineNumber = parseInt(innerLineMatch[1], 10);
+      }
+      return { 
+        message: innerMatch[1].trim().replace(/[\]']+\s*$/, ''),
+        lineNumber
+      };
     }
-    return match[1].trim().replace(/[\]']+\s*$/, '');
+    return { 
+      message: match[1].trim().replace(/[\]']+\s*$/, ''),
+      lineNumber
+    };
   }
   
   // Try to match generic error pattern: remove timestamp, log level and file info
@@ -36,28 +66,61 @@ export const processLogMessage = (log: string): string => {
     // If content is in array format, extract the content
     const arrayMatch = errorMsg.match(/\[\'(.+?)\'\]/);
     if (arrayMatch && arrayMatch[1]) {
-      const innerLineMatch = arrayMatch[1].match(/Line \d+: (.+)$/);
+      // Try to extract line number from the array content
+      const innerLineMatch = arrayMatch[1].match(/Line (\d+):/i);
       if (innerLineMatch && innerLineMatch[1]) {
-        return innerLineMatch[1].trim().replace(/[\]']+\s*$/, '');
+        lineNumber = parseInt(innerLineMatch[1], 10);
       }
-      return arrayMatch[1].trim().replace(/[\]']+\s*$/, '');
+      
+      const innerContentMatch = arrayMatch[1].match(/Line \d+: (.+)$/);
+      if (innerContentMatch && innerContentMatch[1]) {
+        return { 
+          message: innerContentMatch[1].trim().replace(/[\]']+\s*$/, ''),
+          lineNumber
+        };
+      }
+      return { 
+        message: arrayMatch[1].trim().replace(/[\]']+\s*$/, ''),
+        lineNumber
+      };
     }
     
-    return errorMsg.replace(/[\]']+\s*$/, '');
+    return { 
+      message: errorMsg.replace(/[\]']+\s*$/, ''),
+      lineNumber
+    };
   }
   
   // Handle specific array error formats: e.g. [Line 16: RFF value...]
   const arrayError = log.match(/\[\s*['"]?(Line \d+:.+?)['"]?\s*\]/i);
   if (arrayError && arrayError[1]) {
+    // Extract line number from array content
+    const arrayLineMatch = arrayError[1].match(/Line (\d+):/i);
+    if (arrayLineMatch && arrayLineMatch[1]) {
+      lineNumber = parseInt(arrayLineMatch[1], 10);
+    }
+    
     const lineError = arrayError[1].match(/Line \d+:\s*(.+)$/i);
     if (lineError && lineError[1]) {
-      return lineError[1].trim();
+      return { 
+        message: lineError[1].trim(),
+        lineNumber
+      };
     }
-    return arrayError[1].trim();
+    return { 
+      message: arrayError[1].trim(),
+      lineNumber
+    };
   }
   
   // If all previous matches fail, process the original log
   let result = log;
+  
+  // Look for line number in original log
+  const finalLineMatch = result.match(/Line (\d+):/i);
+  if (finalLineMatch && finalLineMatch[1]) {
+    lineNumber = parseInt(finalLineMatch[1], 10);
+  }
   
   // Remove all common prefixes
   const allPrefixes = [
@@ -76,12 +139,21 @@ export const processLogMessage = (log: string): string => {
   const bracketMatch = result.match(/\[\s*['"](.+?)['"]?\s*\]/);
   if (bracketMatch && bracketMatch[1]) {
     result = bracketMatch[1];
+    
+    // Check for line number in bracket content
+    const bracketLineMatch = bracketMatch[1].match(/Line (\d+):/i);
+    if (bracketLineMatch && bracketLineMatch[1]) {
+      lineNumber = parseInt(bracketLineMatch[1], 10);
+    }
   }
   
   // Remove leading and trailing quotes and brackets
   result = result.replace(/^[\s\[\]'"]+|[\s\[\]'"]+$/g, '');
   
-  return result;
+  return { 
+    message: result,
+    lineNumber
+  };
 };
 
 /**

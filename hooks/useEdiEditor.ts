@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 interface IUseEdiEditorProps {
   onDecode: (input: string) => void;
@@ -16,6 +16,7 @@ interface IUseEdiEditorResult {
   handleDecode: () => void;
   handleClear: () => void;
   getInput: () => string;
+  setManualErrorLine: (lineNumber: number) => void;
 }
 
 /**
@@ -30,6 +31,7 @@ export const useEdiEditor = ({
 }: IUseEdiEditorProps): IUseEdiEditorResult => {
   const [input, setInput] = useState("");
   const [errorLines, setErrorLines] = useState<number[]>([]);
+  const [manualErrorLine, setManualErrorLine] = useState<number | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [lineHeight, setLineHeight] = useState(0);
   const [lines, setLines] = useState<string[]>([]);
@@ -57,11 +59,16 @@ export const useEdiEditor = ({
     setLines(input.split('\n'));
   }, [input]);
 
-  // Extract error line numbers from error message
+  // Extract error line numbers from error message and consider manual error line
   useEffect(() => {
+    const newErrorLines = new Set<number>();
+    
+    // Add manual error line if set
+    if (manualErrorLine !== null) {
+      newErrorLines.add(manualErrorLine);
+    }
+    
     if (error) {
-      const newErrorLines = new Set<number>();
-      
       // 1. Check for line number errors (multiple formats)
       const linePatterns = [
         /Line (\d+):/g,
@@ -132,13 +139,14 @@ export const useEdiEditor = ({
           newErrorLines.add(lastNonEmptyIndex.index);
         }
       }
-
-      // Convert to array and sort
-      setErrorLines(Array.from(newErrorLines).sort((a, b) => a - b));
     } else {
-      setErrorLines([]);
+      // Clear manual error line when error is cleared
+      setManualErrorLine(null);
     }
-  }, [error, lines]);
+
+    // Convert to array and sort
+    setErrorLines(Array.from(newErrorLines).sort((a, b) => a - b));
+  }, [error, lines, manualErrorLine]);
 
   // Auto-adjust textarea height
   useEffect(() => {
@@ -158,6 +166,9 @@ export const useEdiEditor = ({
     }
     
     if (onInputChange) onInputChange();
+    
+    // Clear manual error line when input changes
+    setManualErrorLine(null);
   };
 
   const handleDecode = () => {
@@ -168,10 +179,16 @@ export const useEdiEditor = ({
   const handleClear = () => {
     setInput("");
     setErrorLines([]);
+    setManualErrorLine(null);
     if (setError) setError("");
   };
 
   const getInput = () => input;
+
+  // Callback to set manual error line
+  const setLineError = useCallback((lineNumber: number) => {
+    setManualErrorLine(lineNumber);
+  }, []);
 
   return {
     input,
@@ -181,6 +198,7 @@ export const useEdiEditor = ({
     handleChange,
     handleDecode,
     handleClear,
-    getInput
+    getInput,
+    setManualErrorLine: setLineError
   };
 }; 

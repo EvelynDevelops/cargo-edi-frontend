@@ -1,6 +1,6 @@
 "use client";
 
-import React, { forwardRef, useImperativeHandle } from "react";
+import React, { forwardRef, useImperativeHandle, useState } from "react";
 import ErrorPanel from "./ErrorPanel";
 import EdiTextArea from "./EdiTextArea";
 import { useEdiEditor } from "@/hooks/useEdiEditor";
@@ -33,6 +33,9 @@ const EdiTextEditor = forwardRef<IEdiTextEditorRef, IEdiTextEditorProps>(functio
   errorLogs = [],
   setError
 }, ref) {
+  // Manually track error lines for messages processed from logs
+  const [detectedErrorLine, setDetectedErrorLine] = useState<number | null>(null);
+  
   const {
     input,
     errorLines,
@@ -41,13 +44,22 @@ const EdiTextEditor = forwardRef<IEdiTextEditorRef, IEdiTextEditorProps>(functio
     handleChange,
     handleDecode,
     handleClear,
-    getInput
+    getInput,
+    setManualErrorLine
   } = useEdiEditor({
     onDecode,
     onInputChange,
     error,
     setError
   });
+
+  // Handler for when an error line is detected from log message
+  const handleErrorLineDetected = (lineNumber: number) => {
+    // Convert from 1-based to 0-based index
+    setDetectedErrorLine(lineNumber - 1);
+    // Set the error line in the editor
+    setManualErrorLine(lineNumber - 1);
+  };
 
   // Expose methods to parent component
   useImperativeHandle(ref, () => ({
@@ -65,7 +77,11 @@ const EdiTextEditor = forwardRef<IEdiTextEditorRef, IEdiTextEditorProps>(functio
         errorLines={errorLines}
         lines={lines}
       />
-      <ErrorPanel error={error} logs={errorLogs} />
+      <ErrorPanel 
+        error={error} 
+        logs={errorLogs} 
+        onErrorLineDetected={handleErrorLineDetected}
+      />
     </div>
   );
 });
