@@ -35,7 +35,7 @@ const OutputPanel: React.FC<IOutputPanelProps> = ({
   placeholder
 }) => {
   return (
-    <div className="space-y-2 w-full">
+    <div className="space-y-5 w-full">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">{title}</h2>
         {ediOutput && (
@@ -52,7 +52,7 @@ const OutputPanel: React.FC<IOutputPanelProps> = ({
         )}
       </div>
       <div className={cn(
-        "rounded-md border border-input shadow-sm p-4 min-h-135 max-h-full overflow-auto relative",
+        "rounded-md border border-input shadow-sm p-5 min-h-[460px] max-h-full overflow-auto relative",
         "bg-transparent transition-colors"
       )}>
         <pre className={cn(
@@ -63,7 +63,7 @@ const OutputPanel: React.FC<IOutputPanelProps> = ({
         </pre>
         {/* Copy button placed at the top-right corner of the text box */}
         {ediOutput && (
-          <div className="absolute top-2 right-2">
+          <div className="absolute top-3 right-3">
             <CopyButton onCopy={onCopy} />
           </div>
         )}
