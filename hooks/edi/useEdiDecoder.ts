@@ -27,22 +27,42 @@ const checkMissingLines = (edi: string): string | null => {
     return "EDI message is missing required lines. Each cargo item needs at least 3 lines: LIN+, PAC+++, and PAC+ lines.";
   }
 
-  // Check for required line patterns
-  const hasLin = lines.some(line => line.trim().startsWith('LIN+'));
-  const hasPacPlusPlus = lines.some(line => line.trim().startsWith('PAC+++'));
-  const hasPacPlus = lines.some(line => line.trim().startsWith('PAC+'));
+  // Check required lines for each cargo item
+  let currentCargoIndex = 1;
+  let i = 0;
+  
+  while (i < lines.length) {
+    // Check LIN+ line
+    const expectedLin = `LIN+${currentCargoIndex}+I'`;
+    if (!lines[i] || !lines[i].startsWith(`LIN+${currentCargoIndex}+I`)) {
+      return `Line ${i + 1}: Invalid line format. Expected Line Identifier (${expectedLin}).`;
+    }
+    i++;
 
-  if (!hasLin) return "EDI message is missing LIN+ line (cargo item identifier)";
-  if (!hasPacPlusPlus) return "EDI message is missing PAC+++ line (cargo type)";
-  if (!hasPacPlus) return "EDI message is missing PAC+ line (package count)";
+    // Check PAC+++ line
+    if (i >= lines.length || !lines[i].startsWith('PAC+++')) {
+      return `Line ${i + 1}: Expected PAC+++<cargo_type>:67:95'`;
+    }
+    i++;
 
-  // Check for PCI+1' followed by RFF line
-  for (let i = 0; i < lines.length - 1; i++) {
-    if (lines[i].trim() === "PCI+1'") {
-      const nextLine = lines[i + 1].trim();
-      if (!nextLine.startsWith('RFF+')) {
-        return "When PCI+1' is present, it must be followed by an RFF line (RFF+AAQ:, RFF+MB:, or RFF+BH:)";
+    // Check PAC+ line
+    if (i >= lines.length || !lines[i].startsWith('PAC+')) {
+      return `Line ${i + 1}: Expected PAC+<number>+1'`;
+    }
+    i++;
+
+    // Check optional PCI+1' and RFF+ combinations
+    while (i < lines.length && lines[i].startsWith('PCI+1')) {
+      i++;
+      if (i >= lines.length || !lines[i].startsWith('RFF+')) {
+        return `Line ${i}: When PCI+1' is present, it must be followed by an RFF line (RFF+AAQ:, RFF+MB:, or RFF+BH:)`;
       }
+      i++;
+    }
+
+    // If there are more lines, check if it's a new cargo item
+    if (i < lines.length && lines[i].startsWith('LIN+')) {
+      currentCargoIndex++;
     }
   }
 
