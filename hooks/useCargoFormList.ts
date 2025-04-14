@@ -101,6 +101,7 @@ export const useCargoFormList = () => {
   const validateAllInputs = () => {
     let hasErrors = false;
     const newErrors: { [key: number]: ICargoValidationErrors } = {};
+    let firstErrorIndex: number | null = null;
     let firstErrorField: { index: number; field: keyof ICargoFormData } | null = null;
 
     cargoItems.forEach((item, index) => {
@@ -117,7 +118,12 @@ export const useCargoFormList = () => {
         hasErrors = true;
         newErrors[index] = errors;
 
-        // Record the first error field
+        // Record the first error index and field
+        if (firstErrorIndex === null) {
+          firstErrorIndex = index;
+        }
+        
+        // Record the first error field details (for fallback)
         if (!firstErrorField) {
           for (const [field, error] of Object.entries(errors)) {
             if (error) {
@@ -137,15 +143,16 @@ export const useCargoFormList = () => {
       }
     });
 
-    // Scroll to the first error field
-    if (firstErrorField) {
-      const element = document.querySelector(`[data-form-index="${firstErrorField.index}"][data-field="${firstErrorField.field}"]`);
-      if (element) {
-        // Implement more reliable smooth scrolling
-        const scrollToElement = () => {
+    // Scroll to the first error form item
+    if (firstErrorIndex !== null) {
+      const formElement = document.querySelector(`[data-cargo-form-index="${firstErrorIndex}"]`);
+      
+      if (formElement) {
+        // Scroll to the form item
+        const scrollToForm = () => {
           try {
-            // Get element position
-            const rect = element.getBoundingClientRect();
+            // Get form element position
+            const rect = formElement.getBoundingClientRect();
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
             
             // Calculate target position with appropriate spacing
@@ -158,29 +165,81 @@ export const useCargoFormList = () => {
               behavior: 'smooth'
             });
             
-            // Delay focus to allow scrolling to complete
+            // Add highlight effect to the form item
+            formElement.classList.add('highlight-error');
             setTimeout(() => {
-              (element as HTMLElement).focus();
-              
-              // Add temporary highlight effect to error element
-              element.classList.add('highlight-error');
-              setTimeout(() => {
-                element.classList.remove('highlight-error');
-              }, 1500);
-            }, 500);
+              formElement.classList.remove('highlight-error');
+            }, 1500);
+            
+            // If we have a specific field with error, focus it after scrolling to the form
+            if (firstErrorField) {
+              const fieldElement = document.querySelector(`[data-form-index="${firstErrorField.index}"][data-field="${firstErrorField.field}"]`);
+              if (fieldElement) {
+                setTimeout(() => {
+                  (fieldElement as HTMLElement).focus();
+                }, 600);
+              }
+            }
           } catch (err) {
-            // Fallback: use native scrollIntoView
-            console.error('Error during smooth scroll:', err);
-            element.scrollIntoView({ 
-              behavior: 'smooth', 
-              block: 'center' 
-            });
-            setTimeout(() => (element as HTMLElement).focus(), 300);
+            console.error('Error during smooth scroll to form:', err);
+            
+            // Fallback: if form scroll fails, try to scroll to the specific error field
+            if (firstErrorField) {
+              const element = document.querySelector(`[data-form-index="${firstErrorField.index}"][data-field="${firstErrorField.field}"]`);
+              if (element) {
+                element.scrollIntoView({ 
+                  behavior: 'smooth', 
+                  block: 'center' 
+                });
+                setTimeout(() => (element as HTMLElement).focus(), 300);
+              }
+            } else {
+              // Last resort fallback
+              formElement.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+              });
+            }
           }
         };
         
         // Ensure scrolling executes in the next frame to avoid layout issues
-        requestAnimationFrame(scrollToElement);
+        requestAnimationFrame(scrollToForm);
+      } else if (firstErrorField) {
+        // Fallback to field-level scrolling if form element isn't found
+        const element = document.querySelector(`[data-form-index="${firstErrorField.index}"][data-field="${firstErrorField.field}"]`);
+        if (element) {
+          const scrollToElement = () => {
+            try {
+              const rect = element.getBoundingClientRect();
+              const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+              const headerHeight = 80;
+              const targetY = rect.top + scrollTop - headerHeight - 20;
+              
+              window.scrollTo({
+                top: targetY,
+                behavior: 'smooth'
+              });
+              
+              setTimeout(() => {
+                (element as HTMLElement).focus();
+                element.classList.add('highlight-error');
+                setTimeout(() => {
+                  element.classList.remove('highlight-error');
+                }, 1500);
+              }, 500);
+            } catch (err) {
+              console.error('Error during fallback smooth scroll:', err);
+              element.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+              });
+              setTimeout(() => (element as HTMLElement).focus(), 300);
+            }
+          };
+          
+          requestAnimationFrame(scrollToElement);
+        }
       }
     }
 

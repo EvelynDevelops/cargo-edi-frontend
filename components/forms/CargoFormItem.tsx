@@ -41,7 +41,7 @@ const CargoFormItem = forwardRef<CargoFormRef, ICargoFormItemProps>(({
   }));
 
   return (
-    <div className="bg-white border border-gray-300 rounded-xl px-6 py-6 mb-6">
+    <div className="bg-white border border-gray-300 rounded-xl px-6 py-6 mb-6" data-cargo-form-index={index}>
       <CargoFormHeader index={index} onDelete={onDelete} />
 
       <div className="flex flex-col gap-4">
