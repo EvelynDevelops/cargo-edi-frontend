@@ -21,7 +21,7 @@ interface ICargoCardProps {
  */
 const CargoCard: React.FC<ICargoCardProps> = ({ data, index, readOnly = true }) => {
   return (
-    <div className="bg-white border border-gray-300 rounded-xl px-6 py-4 shadow-sm space-y-2 relative w-[420px]">
+    <div className="bg-white border border-gray-300 rounded-xl px-6 py-4 shadow-sm space-y-2 relative w-[430px]">
       {/* Card header with cargo item number */}
       <h3 className="text-lg font-semibold text-gray-800 bg-gray-100 px-4 py-2 -mx-6 -mt-4 rounded-t-xl">
         Cargo Item #{data.id}

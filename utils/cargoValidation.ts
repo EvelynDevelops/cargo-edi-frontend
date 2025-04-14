@@ -39,18 +39,30 @@ const IValidationRules: IValidationRules = {
     {
       validate: (value) => value === "" || /^[A-Za-z0-9]+$/.test(value),
       message: "Container number can only contain letters and numbers"
+    },
+    {
+      validate: (value) => value === "" || value.length <= 17,
+      message: "Container number cannot exceed 17 characters"
     }
   ],
   masterBillNumber: [
     {
       validate: (value) => value === "" || /^[A-Za-z0-9]+$/.test(value),
       message: "Master bill number can only contain letters and numbers"
+    },
+    {
+      validate: (value) => value === "" || value.length <= 17,
+      message: "Master bill number cannot exceed 17 characters"
     }
   ],
   houseBillNumber: [
     {
       validate: (value) => value === "" || /^[A-Za-z0-9]+$/.test(value),
       message: "House bill number can only contain letters and numbers"
+    },
+    {
+      validate: (value) => value === "" || value.length <= 17,
+      message: "House bill number cannot exceed 17 characters"
     }
   ]
 };
