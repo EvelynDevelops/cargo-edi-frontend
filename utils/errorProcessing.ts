@@ -2,10 +2,66 @@
  * Interface for processed error log message
  */
 export interface IProcessedLogMessage {
-  message: string;   // The processed error message
-  lineNumber?: number; // The line number where the error occurred, if available
+  message: string;       // The processed error message
+  lineNumber?: number;   // The line number where the error occurred, if available
   isEmptyLine?: boolean; // Flag indicating if the error is related to an empty line
 }
+
+/**
+ * Common error message prefixes to be removed during processing
+ */
+const ERROR_PREFIXES = [
+  /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}\s*-\s*\w+\s*-\s*\[.*?\]\s*-\s*/,
+  /EDI decoding failed:\s*/i,
+  /Invalid EDI format:\s*/i,
+  /Validation error:\s*/i,
+  /Parse error:\s*/i
+];
+
+/**
+ * Line number extraction patterns
+ */
+const LINE_NUMBER_PATTERNS = [
+  /Line (\d+):/i,
+  /line (\d+) is empty/i,
+  /empty line (\d+)/i,
+  /blank line (\d+)/i,
+  /line (\d+) is blank/i
+];
+
+/**
+ * Extract line number from a message
+ */
+const extractLineNumber = (message: string): number | undefined => {
+  for (const pattern of LINE_NUMBER_PATTERNS) {
+    const match = message.match(pattern);
+    if (match && match[1]) {
+      return parseInt(match[1], 10);
+    }
+  }
+  return undefined;
+};
+
+/**
+ * Clean message content by removing prefixes, brackets, and quotes
+ */
+const cleanMessageContent = (message: string): string => {
+  // Remove standard prefixes
+  let cleaned = message;
+  
+  ERROR_PREFIXES.forEach(prefix => {
+    cleaned = cleaned.replace(prefix, '');
+  });
+  
+  // Extract content from brackets if present
+  const bracketMatch = cleaned.match(/\[\s*['"](.+?)['"]?\s*\]/);
+  if (bracketMatch && bracketMatch[1]) {
+    cleaned = bracketMatch[1];
+  }
+  
+  // Remove leading and trailing quotes, brackets and whitespace
+  return cleaned.replace(/^[\s\[\]'"]+|[\s\[\]'"]+$/g, '');
+};
 
 /**
  * Process log message by extracting the actual error content
@@ -20,170 +76,20 @@ export const processLogMessage = (log: string): IProcessedLogMessage => {
                      log.toLowerCase().includes('blank line') ||
                      log.toLowerCase().includes('no content in line');
   
-  // Extract line number if available
-  let lineNumber: number | undefined = undefined;
-  const lineMatch = log.match(/Line (\d+):/i);
-  if (lineMatch && lineMatch[1]) {
-    lineNumber = parseInt(lineMatch[1], 10);
+  // Clean message and extract content
+  let message = cleanMessageContent(log);
+  
+  // Extract line number from original message or cleaned message
+  let lineNumber = extractLineNumber(log) || extractLineNumber(message);
+  
+  // Handle specific line error format (Line X: Error message)
+  const lineContentMatch = message.match(/Line \d+:\s*(.+)$/i);
+  if (lineContentMatch && lineContentMatch[1]) {
+    message = lineContentMatch[1].trim();
   }
-  
-  // First try to match line-specific error content
-  let match = log.match(/Line \d+: (.+)$/);
-  if (match && match[1]) {
-    // Remove trailing brackets and quotes
-    return { 
-      message: match[1].trim().replace(/[\]']+\s*$/, ''),
-      lineNumber,
-      isEmptyLine
-    };
-  }
-  
-  // Try to match error content in brackets
-  match = log.match(/\[\'(.+?)\'\]/);
-  if (match && match[1]) {
-    // Try to extract more specific error from bracket content
-    const innerMatch = match[1].match(/Line \d+: (.+)$/);
-    if (innerMatch && innerMatch[1]) {
-      // Check if we have a line number in the inner match
-      const innerLineMatch = match[1].match(/Line (\d+):/i);
-      if (innerLineMatch && innerLineMatch[1]) {
-        lineNumber = parseInt(innerLineMatch[1], 10);
-      }
-      return { 
-        message: innerMatch[1].trim().replace(/[\]']+\s*$/, ''),
-        lineNumber,
-        isEmptyLine
-      };
-    }
-    return { 
-      message: match[1].trim().replace(/[\]']+\s*$/, ''),
-      lineNumber,
-      isEmptyLine
-    };
-  }
-  
-  // Try to match generic error pattern: remove timestamp, log level and file info
-  match = log.match(/(?:\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3} - \w+ - \[.+?\] - )(.+)$/);
-  if (match && match[1]) {
-    // Remove common prefixes from the error message
-    let errorMsg = match[1].trim();
-    const prefixes = ['EDI decoding failed:', 'Invalid EDI format:'];
-    prefixes.forEach(prefix => {
-      errorMsg = errorMsg.replace(new RegExp(prefix, 'gi'), '').trim();
-    });
-    
-    // If content is in array format, extract the content
-    const arrayMatch = errorMsg.match(/\[\'(.+?)\'\]/);
-    if (arrayMatch && arrayMatch[1]) {
-      // Try to extract line number from the array content
-      const innerLineMatch = arrayMatch[1].match(/Line (\d+):/i);
-      if (innerLineMatch && innerLineMatch[1]) {
-        lineNumber = parseInt(innerLineMatch[1], 10);
-      }
-      
-      const innerContentMatch = arrayMatch[1].match(/Line \d+: (.+)$/);
-      if (innerContentMatch && innerContentMatch[1]) {
-        return { 
-          message: innerContentMatch[1].trim().replace(/[\]']+\s*$/, ''),
-          lineNumber,
-          isEmptyLine
-        };
-      }
-      return { 
-        message: arrayMatch[1].trim().replace(/[\]']+\s*$/, ''),
-        lineNumber,
-        isEmptyLine
-      };
-    }
-    
-    return { 
-      message: errorMsg.replace(/[\]']+\s*$/, ''),
-      lineNumber,
-      isEmptyLine
-    };
-  }
-  
-  // Handle specific array error formats: e.g. [Line 16: RFF value...]
-  const arrayError = log.match(/\[\s*['"]?(Line \d+:.+?)['"]?\s*\]/i);
-  if (arrayError && arrayError[1]) {
-    // Extract line number from array content
-    const arrayLineMatch = arrayError[1].match(/Line (\d+):/i);
-    if (arrayLineMatch && arrayLineMatch[1]) {
-      lineNumber = parseInt(arrayLineMatch[1], 10);
-    }
-    
-    const lineError = arrayError[1].match(/Line \d+:\s*(.+)$/i);
-    if (lineError && lineError[1]) {
-      return { 
-        message: lineError[1].trim(),
-        lineNumber,
-        isEmptyLine
-      };
-    }
-    return { 
-      message: arrayError[1].trim(),
-      lineNumber,
-      isEmptyLine
-    };
-  }
-  
-  // Special handling for empty line errors without line numbers
-  if (isEmptyLine && !lineNumber) {
-    // Try to extract line number from more specific patterns
-    const emptyLineMatches = [
-      log.match(/empty line (\d+)/i),
-      log.match(/line (\d+) is empty/i),
-      log.match(/blank line (\d+)/i),
-      log.match(/line (\d+) is blank/i)
-    ];
-    
-    for (const emptyMatch of emptyLineMatches) {
-      if (emptyMatch && emptyMatch[1]) {
-        lineNumber = parseInt(emptyMatch[1], 10);
-        break;
-      }
-    }
-  }
-  
-  // If all previous matches fail, process the original log
-  let result = log;
-  
-  // Look for line number in original log
-  const finalLineMatch = result.match(/Line (\d+):/i);
-  if (finalLineMatch && finalLineMatch[1]) {
-    lineNumber = parseInt(finalLineMatch[1], 10);
-  }
-  
-  // Remove all common prefixes
-  const allPrefixes = [
-    /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}\s*-\s*\w+\s*-\s*\[.*?\]\s*-\s*/,
-    /EDI decoding failed:\s*/i,
-    /Invalid EDI format:\s*/i,
-    /Validation error:\s*/i,
-    /Parse error:\s*/i
-  ];
-  
-  allPrefixes.forEach(prefix => {
-    result = result.replace(prefix, '');
-  });
-  
-  // Process content in brackets
-  const bracketMatch = result.match(/\[\s*['"](.+?)['"]?\s*\]/);
-  if (bracketMatch && bracketMatch[1]) {
-    result = bracketMatch[1];
-    
-    // Check for line number in bracket content
-    const bracketLineMatch = bracketMatch[1].match(/Line (\d+):/i);
-    if (bracketLineMatch && bracketLineMatch[1]) {
-      lineNumber = parseInt(bracketLineMatch[1], 10);
-    }
-  }
-  
-  // Remove leading and trailing quotes and brackets
-  result = result.replace(/^[\s\[\]'"]+|[\s\[\]'"]+$/g, '');
   
   return { 
-    message: result,
+    message,
     lineNumber,
     isEmptyLine
   };
@@ -193,6 +99,8 @@ export const processLogMessage = (log: string): IProcessedLogMessage => {
  * Process error message by removing redundant prefixes and formatting
  */
 export const processErrorMessage = (message: string): string => {
+  if (!message) return '';
+  
   // Remove quotes
   let cleanMessage = message.replace(/['"]/g, '');
   
@@ -216,29 +124,16 @@ export const processErrorMessage = (message: string): string => {
     cleanMessage = cleanMessage.replace(new RegExp(prefix, 'gi'), '').trim();
   });
   
-  // Format specific error messages
-  const errorMappings: { [key: string]: string } = {
-    'Empty lines are not allowed': 'Empty lines are not allowed',
-    'Invalid RFF format': 'Invalid RFF format',
-    'Invalid cargo type': 'Invalid cargo type',
-    'Invalid package count': 'Invalid package count',
-    'Invalid MEA segment': 'Invalid MEA segment',
-    'Invalid PCI segment': 'Invalid PCI segment',
-    'Invalid GID segment': 'Invalid GID segment',
-    'Invalid FTX segment': 'Invalid FTX segment'
-  };
-
-  Object.entries(errorMappings).forEach(([key, value]) => {
-    cleanMessage = cleanMessage.replace(new RegExp(key, 'gi'), value);
-  });
-  
   return cleanMessage;
 };
 
 /**
  * Parse EDI format error messages
+ * Handles different error message formats (array, semicolon-separated, newline-separated)
  */
 export const parseEdiFormatError = (error: string): string[] => {
+  if (!error) return [];
+  
   // Remove all error prefixes
   let cleanError = error
     .replace(/EDI decoding failed:\s*/g, '')
@@ -246,34 +141,31 @@ export const parseEdiFormatError = (error: string): string[] => {
     .replace(/Validation error:\s*/g, '')
     .trim();
 
-  // Handle array-style errors
+  // Handle different separator types
+  let errors: string[] = [];
+  
+  // Array-style errors [msg1, msg2, ...]
   if (cleanError.startsWith('[') && cleanError.endsWith(']')) {
-    return cleanError
+    errors = cleanError
       .slice(1, -1)
-      .split(',')
-      .map(msg => msg.trim())
-      .map(processErrorMessage)
-      .filter(Boolean);
+      .split(',');
+  }
+  // Semicolon-separated errors
+  else if (cleanError.includes(';')) {
+    errors = cleanError.split(';');
+  }
+  // Newline-separated errors
+  else if (cleanError.includes('\n')) {
+    errors = cleanError.split('\n');
+  }
+  // Single error message
+  else {
+    errors = [cleanError];
   }
   
-  // Handle semicolon-separated errors
-  if (cleanError.includes(';')) {
-    return cleanError
-      .split(';')
-      .map(msg => msg.trim())
-      .map(processErrorMessage)
-      .filter(Boolean);
-  }
-  
-  // Handle newline-separated errors
-  if (cleanError.includes('\n')) {
-    return cleanError
-      .split('\n')
-      .map(msg => msg.trim())
-      .map(processErrorMessage)
-      .filter(Boolean);
-  }
-  
-  // Handle single error message
-  return [processErrorMessage(cleanError)];
+  // Process each error message and filter out empty ones
+  return errors
+    .map(msg => msg.trim())
+    .map(processErrorMessage)
+    .filter(Boolean);
 }; 

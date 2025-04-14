@@ -1,6 +1,6 @@
 /**
- * @deprecated 此文件保留以兼容现有代码
- * 实际的实现已移至 hooks/edi/useEdiEditor
+ * @deprecated Kept for compatibility with existing code.
+ * Actual implementation is now in hooks/edi/useEdiEditor.
  */
 
 import { useEdiEditor as useEdiEditorImpl } from './edi/useEdiEditor';
