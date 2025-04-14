@@ -187,7 +187,6 @@ const parseEdiFormatError = (error: string): string[] => {
 const ErrorPanel: React.FC<IErrorPanelProps> = ({ error, logs = [] }) => {
   if (!error) return null;
 
-  const errorMessages = parseEdiFormatError(error);
   const hasLogs = logs && logs.length > 0;
   
   // 获取日志的最后一行并处理
@@ -197,25 +196,30 @@ const ErrorPanel: React.FC<IErrorPanelProps> = ({ error, logs = [] }) => {
     processedLogMessage = processLogMessage(lastLogMessage);
   }
 
+  // 如果有处理后的日志信息，则只显示它
+  if (processedLogMessage) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-md p-3 shadow-sm">
+        <div className="text-sm text-red-600 font-mono font-medium">
+          {processedLogMessage}
+        </div>
+      </div>
+    );
+  }
+
+  // 如果没有日志信息，则显示解析后的错误消息
+  const errorMessages = parseEdiFormatError(error);
+  
   return (
-    <div className="bg-red-50 border border-red-200 rounded-md p-3">
+    <div className="bg-red-50 border border-red-200 rounded-md p-3 shadow-sm">
       {errorMessages.map((message, index) => (
         <div 
           key={index} 
-          className="text-sm text-red-500 mb-1 last:mb-0 font-mono"
+          className="text-sm text-red-600 mb-1 last:mb-0 font-mono font-medium"
         >
           {message}
         </div>
       ))}
-      
-      {/* 显示处理后的日志信息 */}
-      {processedLogMessage && (
-        <div className="mt-3 border-t border-red-200 pt-2">
-          <div className="text-xs bg-gray-100 p-2 rounded font-mono text-gray-800">
-            {processedLogMessage}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
