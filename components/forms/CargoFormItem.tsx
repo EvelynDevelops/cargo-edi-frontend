@@ -2,7 +2,7 @@
 
 import React, { forwardRef, useImperativeHandle } from "react";
 import { TextInput } from "../shared/TextInput";
-import { useCargoForm } from "@/hooks/useCargoForm";
+import { useCargoForm } from "@/hooks/form/useCargoForm";
 import CargoFormHeader from "./CargoFormHeader";
 import CargoTypeSelect from "@/components/forms/CargoTypeSelect";
 import PackageCountInput from "@/components/forms/PackageCountInput";   

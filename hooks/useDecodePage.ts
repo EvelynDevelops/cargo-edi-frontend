@@ -1,7 +1,7 @@
 import { useRef } from "react";
-import { useEdiDecoder } from "@/hooks/useEdiDecoder";
-import { useClipboard } from "@/hooks/useClipboard";
-import { useFileDownload } from "@/hooks/useFileDownload";
+import { useEdiDecoder } from "@/hooks/edi/useEdiDecoder";
+import { useClipboard } from "@/hooks/utils/useClipboard";
+import { useFileDownload } from "@/hooks/utils/useFileDownload";
 
 /**
  * Custom hook for handling Decode page business logic

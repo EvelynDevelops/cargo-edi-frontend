@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { generateEdi } from "@/services/api/edi";
-import { useCargoFormList } from "@/hooks/useCargoFormList";
-import { useClipboard } from "@/hooks/useClipboard";
-import { useFileDownload } from "@/hooks/useFileDownload";
+import { useCargoFormList } from "@/hooks/form/useCargoFormList";
+import { useClipboard } from "@/hooks/utils/useClipboard";
+import { useFileDownload } from "@/hooks/utils/useFileDownload";
 
 /**
  * Custom hook for handling Home page business logic

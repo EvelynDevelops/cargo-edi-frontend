@@ -1,5 +1,5 @@
 import React from 'react';
-import { useForm } from '@/hooks/useForm';
+import { useForm } from '@/hooks/form/useForm';
 import { ICargoFormData } from '@/types/cargo';
 import { validateForm } from '@/utils/cargoValidation';
 

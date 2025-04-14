@@ -3,7 +3,7 @@
 import CargoFormItem from "@/components/forms/CargoFormItem";
 import ConfirmationModal from "@/components/modals/ConfirmationModal";
 import HomeLayout from "@/components/layouts/HomeLayout";
-import { useHomePageLogic } from "@/hooks/useHomePageLogic";
+import { useHomePageLogic } from "@/hooks/useHomePage";
 
 /**
  * Home page component for generating EDI messages
