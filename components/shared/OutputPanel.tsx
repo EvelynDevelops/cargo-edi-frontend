@@ -3,6 +3,7 @@
 import React from "react";
 import CopyButton from "@/components/shared/CopyButton";
 import { Button } from "@/components/shared/Button";
+import { cn } from "@/lib/utils";
 
 /**
  * Props for the OutputPanel component
@@ -50,10 +51,14 @@ const OutputPanel: React.FC<IOutputPanelProps> = ({
           </div>
         )}
       </div>
-      <div className="bg-white border border-gray-300 rounded-xl p-4 min-h-135 max-h-full overflow-auto relative">
-        <pre className={`text-sm font-mono whitespace-pre-wrap ${
-          ediOutput ? 'text-black' : 'text-gray-400'
-        }`}>
+      <div className={cn(
+        "rounded-md border border-input shadow-sm p-4 min-h-135 max-h-full overflow-auto relative",
+        "bg-transparent transition-colors"
+      )}>
+        <pre className={cn(
+          "text-sm font-mono whitespace-pre-wrap",
+          ediOutput ? 'text-foreground' : 'text-muted-foreground'
+        )}>
           {ediOutput || placeholder || DEFAULT_PLACEHOLDER}
         </pre>
         {/* Copy button placed at the top-right corner of the text box */}

@@ -1,5 +1,6 @@
 import React from "react";
 import { CargoType } from "@/types/cargo";
+import { cn } from "@/lib/utils";
 
 interface ICargoTypeSelectProps {
   value?: CargoType;
@@ -28,9 +29,14 @@ const CargoTypeSelect: React.FC<ICargoTypeSelectProps> = ({
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">Cargo Type</label>
+      <label className="block text-sm font-medium mb-1">Cargo Type</label>
       <select
-        className={`w-full border border-gray-300 rounded-md px-3 py-2 text-sm ${value ? 'text-gray-900' : 'text-gray-500'}`}
+        className={cn(
+          "w-full h-9 border border-input rounded-md shadow-sm px-3 py-1 text-sm",
+          "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+          "transition-colors",
+          value ? 'text-foreground' : 'text-muted-foreground'
+        )}
         value={value || ""}
         onChange={(e) => handleChange(e.target.value)}
         onBlur={(e) => onBlur(e.target.value)}
@@ -38,10 +44,10 @@ const CargoTypeSelect: React.FC<ICargoTypeSelectProps> = ({
         data-field="cargoType"
         data-testid={dataTestId}
       >
-        <option value="" disabled className="text-gray-500">Select cargo type</option>
-        <option value="FCX" className="text-gray-900">FCX</option>
-        <option value="LCL" className="text-gray-900">LCL</option>
-        <option value="FCL" className="text-gray-900">FCL</option>
+        <option value="" disabled className="text-muted-foreground">Select cargo type</option>
+        <option value="FCX" className="text-foreground">FCX</option>
+        <option value="LCL" className="text-foreground">LCL</option>
+        <option value="FCL" className="text-foreground">FCL</option>
       </select>
       {error && (
         <p className="text-red-500 text-sm mt-1">{error}</p>

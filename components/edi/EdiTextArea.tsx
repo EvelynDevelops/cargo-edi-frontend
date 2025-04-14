@@ -1,5 +1,6 @@
 import React from 'react';
 import ErrorLineHighlighter from './ErrorLineHighlighter';
+import { cn } from "@/lib/utils";
 
 interface IEdiTextAreaProps {
   value: string;
@@ -25,7 +26,13 @@ const EdiTextArea: React.FC<IEdiTextAreaProps> = ({
       <textarea
         ref={textareaRef}
         value={value}
-        className="w-full min-h-135 border border-gray-200 p-3 text-sm font-mono rounded-md resize-none overflow-auto leading-[21px]"
+        className={cn(
+          "w-full min-h-135 border border-input rounded-md shadow-sm",
+          "p-3 text-sm font-mono resize-none overflow-auto",
+          "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+          "placeholder:text-muted-foreground",
+          "transition-colors"
+        )}
         placeholder="Paste existing EDI here to parse it"
         onChange={onChange}
         style={{ lineHeight: '21px' }}
