@@ -1,6 +1,5 @@
 "use client";
 
-import { FC } from "react";
 import CargoFormItem from "@/components/forms/CargoFormItem";
 import ConfirmationModal from "@/components/modals/ConfirmationModal";
 import HomeLayout from "@/components/layouts/HomeLayout";
