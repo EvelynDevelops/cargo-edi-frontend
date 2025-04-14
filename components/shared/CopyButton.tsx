@@ -15,32 +15,12 @@ const CopyButton: React.FC<ICopyButtonProps> = ({ onCopy, className = "" }) => {
   const handleCopy = async (e: React.MouseEvent) => {
     e.preventDefault();
     try {
-      // Locate the textarea element to copy text from
-      const textToCopy = (document.querySelector('textarea') as HTMLTextAreaElement)?.value;
-      if (textToCopy) {
-        // Create a temporary textarea element to use the execCommand API
-        const textArea = document.createElement('textarea');
-        textArea.value = textToCopy;
-        textArea.style.position = 'fixed';  // Ensure it won't be visible on screen
-        textArea.style.left = '-999999px';
-        textArea.style.top = '-999999px';
-        document.body.appendChild(textArea);
-
-        // Select and copy the text
-        textArea.focus();
-        textArea.select();
-        try {
-          await navigator.clipboard.writeText(textToCopy);
-          setIsCopied(true);             // Show "copied" status
-          setTimeout(() => setIsCopied(false), 2000);  // Reset after 2 seconds
-          onCopy();                      // Trigger any callback passed by parent
-        } catch (err) {
-          console.error('Failed to copy text: ', err);
-        }
-
-        // Clean up the temporary textarea
-        document.body.removeChild(textArea);
-      }
+      // Call the onCopy function provided by the parent component
+      onCopy();
+      
+      // Show the success state
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);  // Reset after 2 seconds
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }

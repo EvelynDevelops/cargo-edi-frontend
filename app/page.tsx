@@ -28,7 +28,7 @@ export default function HomePage() {
   const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { copyToClipboard } = useClipboard();
+  const { copyToClipboard } = useClipboard(setError);
   const { downloadFile } = useFileDownload();
 
   // Download EDI result as .edi file
@@ -41,7 +41,16 @@ export default function HomePage() {
 
   // Copy EDI output to clipboard
   const handleCopy = async () => {
-    await copyToClipboard(ediOutput);
+    if (ediOutput) {
+      try {
+        const success = await copyToClipboard(ediOutput);
+        if (!success) {
+          setError("Failed to copy to clipboard");
+        }
+      } catch (err: any) {
+        setError(err.message || "Failed to copy to clipboard");
+      }
+    }
   };
 
   // Submit and generate EDI if all inputs are valid

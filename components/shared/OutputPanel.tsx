@@ -39,6 +39,7 @@ const OutputPanel: React.FC<IOutputPanelProps> = ({
         <h2 className="text-xl font-semibold">{title}</h2>
         {ediOutput && (
           <div className="flex gap-2">
+            <CopyButton onCopy={onCopy} />
             <Button
               variant="outline"
               size="sm"
@@ -56,11 +57,6 @@ const OutputPanel: React.FC<IOutputPanelProps> = ({
         }`}>
           {ediOutput || placeholder || DEFAULT_PLACEHOLDER}
         </pre>
-        {ediOutput && (
-          <div className="absolute top-2 right-2">
-            <CopyButton onCopy={onCopy} />
-          </div>
-        )}
       </div>
     </div>
   );
