@@ -36,65 +36,56 @@ export function useEdiErrorDetection({
         /in line (\d+)/gi
       ];
 
+      let foundLineNumber = false;
       linePatterns.forEach(pattern => {
         const matches = error.matchAll(pattern);
         for (const match of matches) {
           if (match[1]) {
             newErrorLines.add(parseInt(match[1], 10) - 1);
+            foundLineNumber = true;
+            break; // Only add the first line number found
           }
         }
+        if (foundLineNumber) return;
       });
 
-      // 2. Check for specific segment errors
-      const segmentErrors = [
-        { error: "Invalid RFF format", segment: "RFF+" },
-        { error: "Invalid cargo type", segment: "PAC+++" },
-        { error: "package count", segment: "PAC+" },
-        { error: "Invalid MEA segment", segment: "MEA+" },
-        { error: "Invalid PCI segment", segment: "PCI+" },
-        { error: "Invalid GID segment", segment: "GID+" },
-        { error: "Invalid FTX segment", segment: "FTX+" }
-      ];
+      // 2. Check for specific segment errors only if no line number was found
+      if (!foundLineNumber) {
+        const segmentErrors = [
+          { error: "Invalid RFF format", segment: "RFF+" },
+          { error: "Invalid cargo type", segment: "PAC+++" },
+          { error: "package count", segment: "PAC+" },
+          { error: "Invalid MEA segment", segment: "MEA+" },
+          { error: "Invalid PCI segment", segment: "PCI+" },
+          { error: "Invalid GID segment", segment: "GID+" },
+          { error: "Invalid FTX segment", segment: "FTX+" }
+        ];
 
-      segmentErrors.forEach(({ error: errorType, segment }) => {
-        if (error.toLowerCase().includes(errorType.toLowerCase())) {
-          lines.forEach((line, index) => {
-            if (line.startsWith(segment)) {
-              newErrorLines.add(index);
-            }
+        let foundSegmentError = false;
+        segmentErrors.forEach(({ error: errorType, segment }) => {
+          if (!foundSegmentError && error.toLowerCase().includes(errorType.toLowerCase())) {
+            lines.forEach((line, index) => {
+              if (line.startsWith(segment)) {
+                newErrorLines.add(index);
+                foundSegmentError = true;
+                return;
+              }
+            });
+          }
+        });
+
+        // 3. Check for empty line errors
+        if (!foundSegmentError && error.toLowerCase().includes("empty line")) {
+          const emptyLines = findEmptyLines();
+          emptyLines.forEach(index => {
+            newErrorLines.add(index);
           });
         }
-      });
 
-      // 3. Check for empty line errors
-      if (error.toLowerCase().includes("empty line")) {
-        const emptyLines = findEmptyLines();
-        emptyLines.forEach(index => {
-          newErrorLines.add(index);
-        });
-      }
-
-      // 4. Check for format errors
-      if (error.toLowerCase().includes("format")) {
-        const lastLineWithContent = lines
-          .map((line, index) => ({ line, index }))
-          .filter(({ line }) => line.trim() !== '')
-          .pop();
-
-        if (lastLineWithContent) {
-          newErrorLines.add(lastLineWithContent.index);
-        }
-      }
-
-      // 5. If no error lines found but there is an error message
-      if (newErrorLines.size === 0 && lines.length > 0) {
-        const lastNonEmptyIndex = lines
-          .map((line, index) => ({ line, index }))
-          .filter(({ line }) => line.trim() !== '')
-          .pop();
-
-        if (lastNonEmptyIndex) {
-          newErrorLines.add(lastNonEmptyIndex.index);
+        // 4. If still no error lines found but there is an error message,
+        // highlight only the first line
+        if (newErrorLines.size === 0 && lines.length > 0) {
+          newErrorLines.add(0);
         }
       }
     }
