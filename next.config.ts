@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+
+  // Optional: Configure trailing slashes for better S3/CloudFront compatibility
+  trailingSlash: true,
 };
 
 export default nextConfig;
