@@ -1,5 +1,6 @@
 version: 0.2
 
+
 env:
   variables:
     S3_BUCKET: "cargo-edi-frontend"
