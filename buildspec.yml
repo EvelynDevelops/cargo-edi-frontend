@@ -3,7 +3,7 @@ version: 0.2
 env:
   variables:
     S3_BUCKET: "cargo-edi-frontend"
-    CF_DIST_ID: "E3O3XAAZQTH5DM" 
+    CF_DIST_ID: "E3O3XAAZQTH5DM"
 
 phases:
   install:
@@ -14,7 +14,6 @@ phases:
       - nvm install 18
       - node -v
       - npm ci
-
 
   pre_build:
     commands:
@@ -31,10 +30,10 @@ phases:
 
   post_build:
     commands:
-      - echo "Sync to S3: ${S3_BUCKET}"
+      - echo "Sync to S3 - ${S3_BUCKET}"
       - aws s3 sync ./out s3://${S3_BUCKET} --delete --cache-control "public,max-age=31536000,immutable" --exclude "*.html"
       - aws s3 sync ./out s3://${S3_BUCKET} --delete --cache-control "public,max-age=0,must-revalidate" --include "*.html" --exclude "*"
-      - echo "Invalidate CloudFront: ${CF_DIST_ID}"
+      - echo "Invalidate CloudFront - ${CF_DIST_ID}"
       - aws cloudfront create-invalidation --distribution-id ${CF_DIST_ID} --paths "/*"
 
 artifacts:
@@ -44,4 +43,4 @@ artifacts:
 
 cache:
   paths:
-    - node_modules/**/* 
+    - node_modules/**/*
