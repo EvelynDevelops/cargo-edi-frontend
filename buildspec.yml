@@ -21,9 +21,8 @@ phases:
 
   build:
     commands:
-      - echo "Build Next.js and export static site..."
+      - echo "Build Next.js static site..."
       - npm run build
-      - npx next export -o out
       - test -d out || (echo "No 'out' directory!" && exit 1)
       - ls -la out
 
